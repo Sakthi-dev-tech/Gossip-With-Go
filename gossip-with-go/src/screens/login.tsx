@@ -1,6 +1,9 @@
 import { Button, Card, TextField, Typography, Box } from "@mui/material";
+import { useNavigate } from "react-router";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="background">
       <Card
@@ -51,6 +54,7 @@ export default function LoginPage() {
             textTransform: "none",
             borderRadius: 2,
           }}
+          onClick={() => navigate("/topics")}
         >
           Join
         </Button>

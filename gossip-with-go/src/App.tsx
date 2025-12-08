@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "./theme";
-import LoginPage from "./screens/login";
+import LoginPage from "./screens/Login";
+import TopicsPage from "./screens/Topics";
+import PostPage from "./screens/Post";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/topics" element={<TopicsPage />} />
+          <Route path="/post" element={<PostPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
