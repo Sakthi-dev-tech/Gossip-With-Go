@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router";
 
 interface PostCardProps {
   author: string;
@@ -24,6 +25,7 @@ export default function PostCard({
   content,
   commentCount,
 }: PostCardProps) {
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
@@ -98,6 +100,9 @@ export default function PostCard({
               "&:hover": {
                 textDecoration: "underline",
               },
+            }}
+            onClick={() => {
+              navigate(`/post`);
             }}
           >
             Read Comments ({commentCount})

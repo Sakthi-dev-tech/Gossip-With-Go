@@ -6,6 +6,7 @@ import { theme } from "./theme";
 import LoginPage from "./screens/Login";
 import TopicsPage from "./screens/Topics";
 import PostsPage from "./screens/Posts";
+import PostDetailPage from "./screens/PostDetail";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/topics" element={<TopicsPage />} />
           <Route path="/posts" element={<PostsPage />} />
+          <Route path="/post" element={<PostDetailPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
