@@ -3,9 +3,12 @@ import AddIcon from "@mui/icons-material/Add";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
+import CreatePostModal from "../components/CreatePostModal";
 import { Link as RouterLink } from "react-router-dom";
+import { useState } from "react";
 
 export default function PostsPage() {
+  const [openCreatePost, setOpenCreatePost] = useState(false);
   const posts = [
     {
       id: 1,
@@ -39,6 +42,11 @@ export default function PostsPage() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <FloatingAppBar />
+      <CreatePostModal
+        open={openCreatePost}
+        onClose={() => setOpenCreatePost(false)}
+        topicName="Go Language"
+      />
 
       {/* Main Content */}
       <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
@@ -106,6 +114,7 @@ export default function PostsPage() {
                 boxShadow: "0 6px 20px rgba(242, 126, 9, 0.6)",
               },
             }}
+            onClick={() => setOpenCreatePost(true)}
           >
             Create Post
           </Button>

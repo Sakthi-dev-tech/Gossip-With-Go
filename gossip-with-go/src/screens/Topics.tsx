@@ -1,12 +1,21 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
 import FloatingAppBar from "../components/FloatingAppBar";
 import TopicsBox from "../components/TopicsBox";
+import CreateTopicModal from "../components/CreateTopicModal";
+import { useState } from "react";
 
 export default function TopicsPage() {
+  const [openCreateTopic, setOpenCreateTopic] = useState(false);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {/* Floating app bar with welcome message and sign out*/}
       <FloatingAppBar username="User" />
+
+      <CreateTopicModal
+        open={openCreateTopic}
+        onClose={() => setOpenCreateTopic(false)}
+      />
 
       {/* Main content area */}
       <Box sx={{ flex: 1, mt: 12, px: "10%", pb: 4 }}>
@@ -30,7 +39,12 @@ export default function TopicsPage() {
             Topics
           </Typography>
 
-          <Button sx={{ color: "secondary.main" }}>Create Topic</Button>
+          <Button
+            sx={{ color: "secondary.main" }}
+            onClick={() => setOpenCreateTopic(true)}
+          >
+            Create Topic
+          </Button>
         </Box>
 
         <Box sx={{ flexGrow: 1, px: 4 }}>
