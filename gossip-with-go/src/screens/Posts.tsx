@@ -59,7 +59,7 @@ export default function PostsPage() {
             underline="hover"
             color="text.secondary"
           >
-            Home
+            Topics
           </Link>
           <Typography color="text.primary">Go Language</Typography>
         </Breadcrumbs>

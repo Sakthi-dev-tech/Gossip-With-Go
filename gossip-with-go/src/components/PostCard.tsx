@@ -33,7 +33,7 @@ export default function PostCard({
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(255, 255, 255, 0.08)",
         borderRadius: 3,
-        mb: 2, // Margin bottom for spacing between cards
+        mb: 2,
         transition: "transform 0.2s, box-shadow 0.2s",
         "&:hover": {
           boxShadow: "0 4px 20px rgba(0,0,0,0.4)",

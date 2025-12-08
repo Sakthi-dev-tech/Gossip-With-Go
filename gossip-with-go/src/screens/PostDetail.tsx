@@ -4,7 +4,6 @@ import {
   Divider,
   Button,
   TextField,
-  Avatar,
   Breadcrumbs,
   Link,
 } from "@mui/material";
@@ -35,7 +34,7 @@ export default function PostDetailPage() {
             underline="hover"
             color="text.secondary"
           >
-            Home
+            Topics
           </Link>
           <Link
             component={RouterLink}
