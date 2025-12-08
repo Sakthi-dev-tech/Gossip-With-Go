@@ -36,7 +36,7 @@ export default function TopicsBox({
         },
       }}
       elevation={0}
-      onClick={() => navigate("/post")}
+      onClick={() => navigate("/posts")}
     >
       <CardContent
         sx={{
