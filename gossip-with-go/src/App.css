@@ -1,38 +1,34 @@
-.App {
-  text-align: center;
+/* CSS Variables for centralized theme */
+:root {
+  --color-bg-primary: #111922;
+  --color-bg-secondary: #0e141a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-primary: #4a90e2;
+  --color-primary-light: #6ba3e8;
+  --color-primary-dark: #3a7bc8;
+  --color-secondary: #f39c12;
+  --color-secondary-light: #f5b041;
+  --color-secondary-dark: #d68910;
+  --font-family: "Plus Jakarta Sans", "Inter", "Roboto", "Helvetica", "Arial",
+    sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.background {
+  flex: 1;
+  height: 100vh;
+  align-content: center;
+  justify-items: center;
 }
