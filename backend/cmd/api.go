@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -27,6 +28,10 @@ func (app *application) mount() http.Handler {
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("server is up"))
 	})
+
+	topicService := data.NewService()
+	topicsHandler := data.NewHandler(topicService)
+	r.Get("/topics", topicsHandler.ListTopics)
 
 	// http.ListenAndServe(":3333", r)
 
