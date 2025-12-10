@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5"
 )
 
 // mount
@@ -29,7 +31,7 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("server is up"))
 	})
 
-	topicService := data.NewService()
+	topicService := data.NewService(repo.New(app.db))
 	topicsHandler := data.NewHandler(topicService)
 	r.Get("/topics", topicsHandler.ListTopics)
 
@@ -55,6 +57,7 @@ func (app *application) run(h http.Handler) error {
 
 type application struct {
 	config config
+	db     *pgx.Conn
 }
 
 type config struct {

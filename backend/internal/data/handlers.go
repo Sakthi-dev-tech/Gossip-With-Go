@@ -19,18 +19,14 @@ func NewHandler(service Service) *handler {
 
 func (h *handler) ListTopics(w http.ResponseWriter, r *http.Request) {
 	// Call this service -> ListTopics
-	err := h.service.ListTopics(r.Context())
+	topics, err := h.service.ListTopics(r.Context())
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return JSON in an HTTP response
-
-	topics := struct {
-		Topics []string `json:"topics"`
-	}{}
+	// Return JSON in an HTTP respon
 
 	json.Write(w, http.StatusOK, topics)
 }
