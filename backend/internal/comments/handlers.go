@@ -59,3 +59,44 @@ func (h *handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
 	json.Write(w, http.StatusOK, createdComment)
 }
+
+// Function that handles the UpdateComment API
+func (h *handler) UpdateComment(w http.ResponseWriter, r *http.Request) {
+	// get the comment params from the request body
+	var updateCommentParams repo.UpdateCommentParams
+	if err := json.Read(r, &updateCommentParams); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updatedComment, err := h.service.UpdateComment(r.Context(), updateCommentParams)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.Write(w, http.StatusOK, updatedComment)
+}
+
+// Function that handles the DeleteComment API
+func (h *handler) DeleteComment(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		ID int64 `json:"id"`
+	}
+	if err := json.Read(r, &data); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	deletedComment, err := h.service.DeleteComment(r.Context(), data.ID)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.Write(w, http.StatusOK, deletedComment)
+}

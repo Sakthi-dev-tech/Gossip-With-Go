@@ -20,4 +20,6 @@ type svc struct {
 type Service interface {
 	ListPosts(ctx context.Context, topicId int64) ([]repo.Post, error)
 	CreatePost(ctx context.Context, params repo.CreatePostParams) (repo.Post, error)
+	UpdatePost(ctx context.Context, params repo.UpdatePostParams) (repo.Post, error)
+	DeletePost(ctx context.Context, id int64) (repo.Post, error)
 }

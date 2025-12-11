@@ -50,3 +50,44 @@ func (h *handler) CreateTopic(w http.ResponseWriter, r *http.Request) {
 
 	json.Write(w, http.StatusOK, createdTopic)
 }
+
+// Function that handles the UpdateTopic API
+func (h *handler) UpdateTopic(w http.ResponseWriter, r *http.Request) {
+	// get the topic params from the request body
+	var updateTopicParams repo.UpdateTopicParams
+	if err := json.Read(r, &updateTopicParams); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updatedTopic, err := h.service.UpdateTopic(r.Context(), updateTopicParams)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.Write(w, http.StatusOK, updatedTopic)
+}
+
+// Function that handles the DeleteTopic API
+func (h *handler) DeleteTopic(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		ID int64 `json:"id"`
+	}
+	if err := json.Read(r, &data); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	deletedTopic, err := h.service.DeleteTopic(r.Context(), data.ID)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.Write(w, http.StatusOK, deletedTopic)
+}

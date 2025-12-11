@@ -20,4 +20,6 @@ type svc struct {
 type Service interface {
 	ListComments(ctx context.Context, postId int64) ([]repo.Comment, error)
 	CreateComment(ctx context.Context, params repo.CreateCommentParams) (repo.Comment, error)
+	UpdateComment(ctx context.Context, params repo.UpdateCommentParams) (repo.Comment, error)
+	DeleteComment(ctx context.Context, id int64) (repo.Comment, error)
 }

@@ -44,16 +44,22 @@ func (app *application) mount() http.Handler {
 	topicsHandler := topics.NewHandler(topicService)
 	r.Get("/fetchTopics", topicsHandler.ListTopics)
 	r.Post("/addTopic", topicsHandler.CreateTopic)
+	r.Put("/updateTopic", topicsHandler.UpdateTopic)
+	r.Delete("/deleteTopic", topicsHandler.DeleteTopic)
 
 	postService := posts.NewService(repo.New(app.db), app.db)
 	postsHandler := posts.NewHandler(postService)
 	r.Get("/fetchPosts", postsHandler.ListPosts)
 	r.Post("/addPost", postsHandler.CreatePost)
+	r.Put("/updatePost", postsHandler.UpdatePost)
+	r.Delete("/deletePost", postsHandler.DeletePost)
 
 	commentService := comments.NewService(repo.New(app.db), app.db)
 	commentsHandler := comments.NewHandler(commentService)
 	r.Get("/fetchComments", commentsHandler.ListComments)
 	r.Post("/addComment", commentsHandler.CreateComment)
+	r.Put("/updateComment", commentsHandler.UpdateComment)
+	r.Delete("/deleteComment", commentsHandler.DeleteComment)
 
 	return r
 }

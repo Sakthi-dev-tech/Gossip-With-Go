@@ -40,3 +40,48 @@ func (s *svc) CreateComment(ctx context.Context, params repo.CreateCommentParams
 
 	return comment, nil
 }
+
+func (s *svc) UpdateComment(ctx context.Context, params repo.UpdateCommentParams) (repo.Comment, error) {
+	// validate the params
+	if params.Content == "" {
+		return repo.Comment{}, fmt.Errorf("content is required")
+	}
+
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return repo.Comment{}, err
+	}
+	defer tx.Rollback(ctx)
+	qtx := s.repo.WithTx(tx)
+
+	comment, err := qtx.UpdateComment(ctx, params)
+	if err != nil {
+		return repo.Comment{}, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return repo.Comment{}, err
+	}
+
+	return comment, nil
+}
+
+func (s *svc) DeleteComment(ctx context.Context, id int64) (repo.Comment, error) {
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return repo.Comment{}, err
+	}
+	defer tx.Rollback(ctx)
+	qtx := s.repo.WithTx(tx)
+
+	comment, err := qtx.DeleteComment(ctx, id)
+	if err != nil {
+		return repo.Comment{}, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return repo.Comment{}, err
+	}
+
+	return comment, nil
+}
