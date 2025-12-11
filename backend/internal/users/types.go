@@ -20,5 +20,4 @@ type svc struct {
 type Service interface {
 	CreateUser(ctx context.Context, params repo.CreateUserParams) (repo.User, error)
 	FetchUserByUsername(ctx context.Context, params string) (repo.User, error)
-	FetchUserById(ctx context.Context, params int64) (repo.User, error)
 }

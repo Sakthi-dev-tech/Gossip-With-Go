@@ -16,7 +16,6 @@ type Querier interface {
 	DeleteComment(ctx context.Context, id int64) (Comment, error)
 	DeletePost(ctx context.Context, id int64) (Post, error)
 	DeleteTopic(ctx context.Context, id int64) (Topic, error)
-	FetchUserById(ctx context.Context, id int64) (User, error)
 	FetchUserByUsername(ctx context.Context, username string) (User, error)
 	ListComments(ctx context.Context, postID int64) ([]Comment, error)
 	ListPosts(ctx context.Context, topicID int64) ([]Post, error)

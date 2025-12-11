@@ -54,23 +54,3 @@ func (h *handler) FetchUserByUsername(w http.ResponseWriter, r *http.Request) {
 
 	json.Write(w, http.StatusOK, user)
 }
-
-func (h *handler) FetchUserById(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Id int64 `json:"id"`
-	}
-	if err := json.Read(r, &data); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.service.FetchUserById(r.Context(), data.Id)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.Write(w, http.StatusOK, user)
-}
