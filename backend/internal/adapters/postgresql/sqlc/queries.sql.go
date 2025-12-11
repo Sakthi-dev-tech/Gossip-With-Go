@@ -9,8 +9,197 @@ import (
 	"context"
 )
 
+const createComment = `-- name: CreateComment :one
+INSERT INTO comments (content, post_id, user_id) VALUES ($1, $2, $3) RETURNING id, content, user_id, post_id, created_at
+`
+
+type CreateCommentParams struct {
+	Content string `json:"content"`
+	PostID  int64  `json:"post_id"`
+	UserID  int64  `json:"user_id"`
+}
+
+func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
+	row := q.db.QueryRow(ctx, createComment, arg.Content, arg.PostID, arg.UserID)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Content,
+		&i.UserID,
+		&i.PostID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createPost = `-- name: CreatePost :one
+INSERT INTO posts (title, content, topic_id, user_id) VALUES ($1, $2, $3, $4) RETURNING id, title, content, user_id, topic_id, created_at
+`
+
+type CreatePostParams struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	TopicID int64  `json:"topic_id"`
+	UserID  int64  `json:"user_id"`
+}
+
+func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
+	row := q.db.QueryRow(ctx, createPost,
+		arg.Title,
+		arg.Content,
+		arg.TopicID,
+		arg.UserID,
+	)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.UserID,
+		&i.TopicID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createTopic = `-- name: CreateTopic :one
+INSERT INTO topics (name, description, user_id) VALUES ($1, $2, $3) RETURNING id, name, description, user_id, created_at
+`
+
+type CreateTopicParams struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	UserID      int64  `json:"user_id"`
+}
+
+func (q *Queries) CreateTopic(ctx context.Context, arg CreateTopicParams) (Topic, error) {
+	row := q.db.QueryRow(ctx, createTopic, arg.Name, arg.Description, arg.UserID)
+	var i Topic
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.UserID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const deleteComment = `-- name: DeleteComment :one
+DELETE FROM comments WHERE id = $1 RETURNING id, content, user_id, post_id, created_at
+`
+
+func (q *Queries) DeleteComment(ctx context.Context, id int64) (Comment, error) {
+	row := q.db.QueryRow(ctx, deleteComment, id)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Content,
+		&i.UserID,
+		&i.PostID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const deletePost = `-- name: DeletePost :one
+DELETE FROM posts WHERE id = $1 RETURNING id, title, content, user_id, topic_id, created_at
+`
+
+func (q *Queries) DeletePost(ctx context.Context, id int64) (Post, error) {
+	row := q.db.QueryRow(ctx, deletePost, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.UserID,
+		&i.TopicID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const deleteTopic = `-- name: DeleteTopic :one
+DELETE FROM topics WHERE id = $1 RETURNING id, name, description, user_id, created_at
+`
+
+func (q *Queries) DeleteTopic(ctx context.Context, id int64) (Topic, error) {
+	row := q.db.QueryRow(ctx, deleteTopic, id)
+	var i Topic
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.UserID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listComments = `-- name: ListComments :many
+SELECT id, content, user_id, post_id, created_at FROM comments WHERE post_id = $1
+`
+
+func (q *Queries) ListComments(ctx context.Context, postID int64) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, listComments, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Comment
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Content,
+			&i.UserID,
+			&i.PostID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listPosts = `-- name: ListPosts :many
+SELECT id, title, content, user_id, topic_id, created_at FROM posts WHERE topic_id = $1
+`
+
+func (q *Queries) ListPosts(ctx context.Context, topicID int64) ([]Post, error) {
+	rows, err := q.db.Query(ctx, listPosts, topicID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.UserID,
+			&i.TopicID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTopics = `-- name: ListTopics :many
-SELECT id, name, description, created_at FROM topics
+SELECT id, name, description, user_id, created_at FROM topics
 `
 
 func (q *Queries) ListTopics(ctx context.Context) ([]Topic, error) {
@@ -26,6 +215,7 @@ func (q *Queries) ListTopics(ctx context.Context) ([]Topic, error) {
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.UserID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -36,4 +226,73 @@ func (q *Queries) ListTopics(ctx context.Context) ([]Topic, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateComment = `-- name: UpdateComment :one
+UPDATE comments SET content = $2 WHERE id = $1 RETURNING id, content, user_id, post_id, created_at
+`
+
+type UpdateCommentParams struct {
+	ID      int64  `json:"id"`
+	Content string `json:"content"`
+}
+
+func (q *Queries) UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error) {
+	row := q.db.QueryRow(ctx, updateComment, arg.ID, arg.Content)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.Content,
+		&i.UserID,
+		&i.PostID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updatePost = `-- name: UpdatePost :one
+UPDATE posts SET title = $2, content = $3 WHERE id = $1 RETURNING id, title, content, user_id, topic_id, created_at
+`
+
+type UpdatePostParams struct {
+	ID      int64  `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error) {
+	row := q.db.QueryRow(ctx, updatePost, arg.ID, arg.Title, arg.Content)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.UserID,
+		&i.TopicID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateTopic = `-- name: UpdateTopic :one
+UPDATE topics SET name = $2, description = $3 WHERE id = $1 RETURNING id, name, description, user_id, created_at
+`
+
+type UpdateTopicParams struct {
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func (q *Queries) UpdateTopic(ctx context.Context, arg UpdateTopicParams) (Topic, error) {
+	row := q.db.QueryRow(ctx, updateTopic, arg.ID, arg.Name, arg.Description)
+	var i Topic
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.UserID,
+		&i.CreatedAt,
+	)
+	return i, err
 }

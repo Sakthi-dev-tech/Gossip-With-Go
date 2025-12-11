@@ -9,7 +9,18 @@ import (
 )
 
 type Querier interface {
+	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
+	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
+	CreateTopic(ctx context.Context, arg CreateTopicParams) (Topic, error)
+	DeleteComment(ctx context.Context, id int64) (Comment, error)
+	DeletePost(ctx context.Context, id int64) (Post, error)
+	DeleteTopic(ctx context.Context, id int64) (Topic, error)
+	ListComments(ctx context.Context, postID int64) ([]Comment, error)
+	ListPosts(ctx context.Context, topicID int64) ([]Post, error)
 	ListTopics(ctx context.Context) ([]Topic, error)
+	UpdateComment(ctx context.Context, arg UpdateCommentParams) (Comment, error)
+	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
+	UpdateTopic(ctx context.Context, arg UpdateTopicParams) (Topic, error)
 }
 
 var _ Querier = (*Queries)(nil)
