@@ -33,12 +33,14 @@ func (s *svc) CreateTopic(ctx context.Context, params repo.CreateTopicParams) (r
 	defer tx.Rollback(ctx)
 	qtx := s.repo.WithTx(tx)
 
-	order, err := qtx.CreateTopic(ctx, params)
+	topic, err := qtx.CreateTopic(ctx, params)
 	if err != nil {
 		return repo.Topic{}, err
 	}
 
-	tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return repo.Topic{}, err
+	}
 
-	return order, nil
+	return topic, nil
 }

@@ -33,9 +33,9 @@ func (app *application) mount() http.Handler {
 
 	topicService := topics.NewService(repo.New(app.db), app.db)
 	topicsHandler := topics.NewHandler(topicService)
-	r.Get("/topics", topicsHandler.ListTopics)
+	r.Get("/fetchtopics", topicsHandler.ListTopics)
 
-	r.Get("/addtopic", topicsHandler.CreateTopic)
+	r.Post("/addtopic", topicsHandler.CreateTopic)
 
 	return r
 }
