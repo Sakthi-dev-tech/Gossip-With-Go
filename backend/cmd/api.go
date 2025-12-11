@@ -6,6 +6,8 @@ import (
 	"time"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/comments"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/posts"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/topics"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/users"
 	"github.com/go-chi/chi/v5"
@@ -41,8 +43,17 @@ func (app *application) mount() http.Handler {
 	topicService := topics.NewService(repo.New(app.db), app.db)
 	topicsHandler := topics.NewHandler(topicService)
 	r.Get("/fetchTopics", topicsHandler.ListTopics)
-
 	r.Post("/addTopic", topicsHandler.CreateTopic)
+
+	postService := posts.NewService(repo.New(app.db), app.db)
+	postsHandler := posts.NewHandler(postService)
+	r.Get("/fetchPosts", postsHandler.ListPosts)
+	r.Post("/addPost", postsHandler.CreatePost)
+
+	commentService := comments.NewService(repo.New(app.db), app.db)
+	commentsHandler := comments.NewHandler(commentService)
+	r.Get("/fetchComments", commentsHandler.ListComments)
+	r.Post("/addComment", commentsHandler.CreateComment)
 
 	return r
 }
