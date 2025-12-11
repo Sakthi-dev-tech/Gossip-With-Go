@@ -36,6 +36,8 @@ func (app *application) mount() http.Handler {
 	userService := users.NewService(repo.New(app.db), app.db)
 	usersHandler := users.NewHandler(userService)
 	r.Post("/addUser", usersHandler.CreateUser)
+	r.Get("/fetchUserByUsername", usersHandler.FetchUserByUsername)
+	r.Get("/fetchUserById", usersHandler.FetchUserById)
 
 	topicService := topics.NewService(repo.New(app.db), app.db)
 	topicsHandler := topics.NewHandler(topicService)

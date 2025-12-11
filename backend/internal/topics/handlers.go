@@ -26,13 +26,14 @@ func (h *handler) ListTopics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return JSON in an HTTP respon
-
+	// Return JSON in an HTTP response
 	json.Write(w, http.StatusOK, topics)
 }
 
 // Function that handles the CreateTopic API
 func (h *handler) CreateTopic(w http.ResponseWriter, r *http.Request) {
+
+	// get the topic params from the request body
 	var createTopicsParams repo.CreateTopicParams
 	if err := json.Read(r, &createTopicsParams); err != nil {
 		log.Println(err)

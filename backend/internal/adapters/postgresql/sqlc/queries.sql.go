@@ -158,12 +158,28 @@ func (q *Queries) DeleteTopic(ctx context.Context, id int64) (Topic, error) {
 	return i, err
 }
 
-const fetchUser = `-- name: FetchUser :one
+const fetchUserById = `-- name: FetchUserById :one
+SELECT id, username, password, created_at FROM users WHERE id = $1
+`
+
+func (q *Queries) FetchUserById(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, fetchUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const fetchUserByUsername = `-- name: FetchUserByUsername :one
 SELECT id, username, password, created_at FROM users WHERE username = $1
 `
 
-func (q *Queries) FetchUser(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRow(ctx, fetchUser, username)
+func (q *Queries) FetchUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, fetchUserByUsername, username)
 	var i User
 	err := row.Scan(
 		&i.ID,

@@ -7,8 +7,11 @@ SELECT * FROM posts WHERE topic_id = $1;
 -- name: ListComments :many
 SELECT * FROM comments WHERE post_id = $1;
 
--- name: FetchUser :one
+-- name: FetchUserByUsername :one
 SELECT * FROM users WHERE username = $1;
+
+-- name: FetchUserById :one
+SELECT * FROM users WHERE id = $1;
 
 -- name: CreateTopic :one
 INSERT INTO topics (name, description, user_id) VALUES ($1, $2, $3) RETURNING *;

@@ -40,3 +40,19 @@ func (s *svc) CreateUser(ctx context.Context, params repo.CreateUserParams) (rep
 
 	return user, nil
 }
+
+func (s *svc) FetchUserByUsername(ctx context.Context, username string) (repo.User, error) {
+	user, err := s.repo.FetchUserByUsername(ctx, username)
+	if err != nil {
+		return repo.User{}, err
+	}
+	return user, nil
+}
+
+func (s *svc) FetchUserById(ctx context.Context, id int64) (repo.User, error) {
+	user, err := s.repo.FetchUserById(ctx, id)
+	if err != nil {
+		return repo.User{}, err
+	}
+	return user, nil
+}
