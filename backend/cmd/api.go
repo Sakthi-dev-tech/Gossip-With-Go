@@ -7,12 +7,14 @@ import (
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/topics"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/users"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
 )
 
 // mount
+// attach a mount method for an application instance to mount the routes
 func (app *application) mount() http.Handler {
 	r := chi.NewRouter()
 
@@ -31,16 +33,21 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("server is up"))
 	})
 
+	userService := users.NewService(repo.New(app.db), app.db)
+	usersHandler := users.NewHandler(userService)
+	r.Post("/addUser", usersHandler.CreateUser)
+
 	topicService := topics.NewService(repo.New(app.db), app.db)
 	topicsHandler := topics.NewHandler(topicService)
-	r.Get("/fetchtopics", topicsHandler.ListTopics)
+	r.Get("/fetchTopics", topicsHandler.ListTopics)
 
-	r.Post("/addtopic", topicsHandler.CreateTopic)
+	r.Post("/addTopic", topicsHandler.CreateTopic)
 
 	return r
 }
 
 // run
+// attach a run method for an application instance to start the server
 func (app *application) run(h http.Handler) error {
 	srv := &http.Server{
 		Addr:         app.config.addr,

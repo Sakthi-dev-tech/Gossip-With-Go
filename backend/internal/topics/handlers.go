@@ -8,12 +8,15 @@ import (
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/json"
 )
 
+// NewHandler
+// function to create a handler instance with the service layer as dependency
 func NewHandler(service Service) *handler {
 	return &handler{
 		service: service,
 	}
 }
 
+// Function that handles the ListTopics API
 func (h *handler) ListTopics(w http.ResponseWriter, r *http.Request) {
 	// Call this service -> ListTopics
 	topics, err := h.service.ListTopics(r.Context())
@@ -28,6 +31,7 @@ func (h *handler) ListTopics(w http.ResponseWriter, r *http.Request) {
 	json.Write(w, http.StatusOK, topics)
 }
 
+// Function that handles the CreateTopic API
 func (h *handler) CreateTopic(w http.ResponseWriter, r *http.Request) {
 	var createTopicsParams repo.CreateTopicParams
 	if err := json.Read(r, &createTopicsParams); err != nil {
