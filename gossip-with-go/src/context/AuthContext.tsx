@@ -1,9 +1,9 @@
-import { stringify } from "querystring";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<string>;
+  register: (username: string, password: string) => Promise<string>;
   logout: () => void;
   loading: boolean;
 }
@@ -61,6 +61,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const register = async (
+    username: string,
+    password: string
+  ): Promise<string> => {
+    console.log("Registering...");
+
+    try {
+      const response = await fetch(`${apiUrl}:${apiPort}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        // Store token if backend returns one
+        if (data.token) {
+          localStorage.setItem("authToken", data.token);
+        }
+        setIsAuthenticated(true);
+        return "success";
+      } else {
+        const errorText = await response.text();
+        console.log("Register failed:", errorText);
+        setIsAuthenticated(false);
+        return errorText || "Register failed";
+      }
+    } catch (error) {
+      console.error("Register error:", error);
+      setIsAuthenticated(false);
+      return error instanceof Error ? error.message : "Network error";
+    }
+  };
+
   const logout = () => {
     console.log("Logging out...");
     setIsAuthenticated(false);
@@ -71,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         isAuthenticated,
         login,
+        register,
         logout,
         loading,
       }}

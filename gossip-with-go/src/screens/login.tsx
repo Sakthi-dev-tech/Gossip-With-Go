@@ -9,7 +9,6 @@ import {
   Collapse,
   Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
@@ -20,7 +19,7 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(true);
 
-  const { login } = useAuth();
+  const { login, register } = useAuth();
 
   // Handle transition between Login and Register
   const handleToggle = () => {
@@ -150,20 +149,38 @@ export default function LoginPage() {
                 return;
               }
 
-              try {
-                const result = await login(username, password);
-                if (result !== "success") {
-                  // Display error message on the page
-                  setErrorMessage(result);
-                  console.error("Login failed:", result);
+              if (isLogin) {
+                try {
+                  const result = await login(username, password);
+                  if (result !== "success") {
+                    // Display error message on the page
+                    setErrorMessage(result);
+                    console.error("Login failed:", result);
+                  }
+                } catch (error) {
+                  const errMsg =
+                    error instanceof Error
+                      ? error.message
+                      : "An unexpected error occurred";
+                  setErrorMessage(errMsg);
+                  console.error("Login error:", error);
                 }
-              } catch (error) {
-                const errMsg =
-                  error instanceof Error
-                    ? error.message
-                    : "An unexpected error occurred";
-                setErrorMessage(errMsg);
-                console.error("Login error:", error);
+              } else {
+                try {
+                  const result = await register(username, password);
+                  if (result !== "success") {
+                    // Display error message on the page
+                    setErrorMessage(result);
+                    console.error("Register failed:", result);
+                  }
+                } catch (error) {
+                  const errMsg =
+                    error instanceof Error
+                      ? error.message
+                      : "An unexpected error occurred";
+                  setErrorMessage(errMsg);
+                  console.error("Register error:", error);
+                }
               }
             }}
           >

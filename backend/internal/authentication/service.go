@@ -2,10 +2,13 @@ package authentication
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -39,6 +42,16 @@ func (s *svc) CreateUser(ctx context.Context, params repo.CreateUserParams) (rep
 
 	user, err := qtx.CreateUser(ctx, params)
 	if err != nil {
+		// return a more user friendly error message
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.UniqueViolation:
+				return repo.User{}, fmt.Errorf("username already exists")
+			default:
+				return repo.User{}, fmt.Errorf("database error: %s", pgErr.Code)
+			}
+		}
 		return repo.User{}, err
 	}
 
