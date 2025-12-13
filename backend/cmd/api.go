@@ -6,12 +6,14 @@ import (
 	"time"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/authentication"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/comments"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/posts"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/topics"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/users"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -19,6 +21,16 @@ import (
 // attach a mount method for an application instance to mount the routes
 func (app *application) mount() http.Handler {
 	r := chi.NewRouter()
+
+	// Allow CORS
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 
 	// A good base middleware stack
 	r.Use(middleware.RequestID) // for rate limiting (not really impt)
@@ -35,9 +47,13 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("server is up"))
 	})
 
+	authService := authentication.NewService(repo.New(app.db), app.db)
+	authHandler := authentication.NewHandler(authService)
+	r.Post("/register", authHandler.CreateUser)
+	r.Post("/login", authHandler.LoginUser)
+
 	userService := users.NewService(repo.New(app.db), app.db)
 	usersHandler := users.NewHandler(userService)
-	r.Post("/addUser", usersHandler.CreateUser)
 	r.Get("/fetchUserByUsername", usersHandler.FetchUserByUsername)
 
 	topicService := topics.NewService(repo.New(app.db), app.db)

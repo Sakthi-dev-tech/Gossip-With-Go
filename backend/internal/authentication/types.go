@@ -1,4 +1,4 @@
-package users
+package authentication
 
 import (
 	"context"
@@ -17,6 +17,12 @@ type svc struct {
 	db   *pgx.Conn
 }
 
+type authenticatedResponse struct {
+	authorised bool
+	error      error
+}
+
 type Service interface {
-	FetchUserByUsername(ctx context.Context, params string) (repo.User, error)
+	CreateUser(ctx context.Context, params repo.CreateUserParams) (repo.User, error)
+	LoginUser(ctx context.Context, username string, password string) (bool, error)
 }

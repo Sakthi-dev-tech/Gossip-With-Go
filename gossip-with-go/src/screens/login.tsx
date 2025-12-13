@@ -4,7 +4,9 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(true);
 
@@ -67,6 +69,7 @@ export default function LoginPage() {
               required
               fullWidth
               autoFocus={visible}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               label="Password"
@@ -75,6 +78,7 @@ export default function LoginPage() {
               type="password"
               required
               fullWidth
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Box>
 
@@ -90,8 +94,15 @@ export default function LoginPage() {
               textTransform: "none",
               borderRadius: 2,
             }}
-            onClick={() => {
-              login("token");
+            onClick={async () => {
+              try {
+                const result = await login(username, password);
+                if (result !== "success") {
+                  console.error("Login failed:", result);
+                }
+              } catch (error) {
+                console.error("Login error:", error);
+              }
             }}
           >
             {isLogin ? "Login" : "Register"}
