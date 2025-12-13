@@ -1,11 +1,21 @@
 import { useState } from "react";
-import { Button, Card, TextField, Typography, Box, Fade } from "@mui/material";
+import {
+  Button,
+  Card,
+  TextField,
+  Typography,
+  Box,
+  Fade,
+  Collapse,
+  Alert,
+} from "@mui/material";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(true);
@@ -15,6 +25,9 @@ export default function LoginPage() {
   // Handle transition between Login and Register
   const handleToggle = () => {
     setVisible(false);
+    setUsername("");
+    setPassword("");
+    setErrorMessage("");
     setTimeout(() => {
       setIsLogin((prev) => !prev);
       setVisible(true);
@@ -68,6 +81,7 @@ export default function LoginPage() {
               color="secondary"
               required
               fullWidth
+              value={username}
               autoFocus={visible}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -78,9 +92,36 @@ export default function LoginPage() {
               type="password"
               required
               fullWidth
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </Box>
+
+          {/* Error Message Display */}
+          <Collapse in={!!errorMessage}>
+            <Alert
+              severity="error"
+              onClose={() => setErrorMessage("")}
+              sx={{
+                borderRadius: 2,
+                animation: errorMessage ? "shake 0.3s" : "none",
+                "@keyframes shake": {
+                  "0%, 100%": { transform: "translateX(0)" },
+                  "25%": { transform: "translateX(-5px)" },
+                  "75%": { transform: "translateX(5px)" },
+                },
+              }}
+            >
+              {/* make only the starting letter of each word uppercase */}
+              {errorMessage
+                .split(" ")
+                .map(
+                  (word) =>
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                )
+                .join(" ")}
+            </Alert>
+          </Collapse>
 
           <Button
             variant="contained"
@@ -95,12 +136,33 @@ export default function LoginPage() {
               borderRadius: 2,
             }}
             onClick={async () => {
+              // Clear previous error message when user tries again
+              setErrorMessage("");
+
+              // Validate that username and password are not empty
+              if (!username.trim()) {
+                setErrorMessage("Please enter a username");
+                return;
+              }
+
+              if (!password.trim()) {
+                setErrorMessage("Please enter a password");
+                return;
+              }
+
               try {
                 const result = await login(username, password);
                 if (result !== "success") {
+                  // Display error message on the page
+                  setErrorMessage(result);
                   console.error("Login failed:", result);
                 }
               } catch (error) {
+                const errMsg =
+                  error instanceof Error
+                    ? error.message
+                    : "An unexpected error occurred";
+                setErrorMessage(errMsg);
                 console.error("Login error:", error);
               }
             }}

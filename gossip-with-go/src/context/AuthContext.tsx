@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (username: string, password: string): Promise<string> => {
     console.log("Authenticating...");
-    console.log(`API URL: ${apiUrl}:${apiPort}/login`);
 
     try {
       const response = await fetch(`${apiUrl}:${apiPort}/login`, {
