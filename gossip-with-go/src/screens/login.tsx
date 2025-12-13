@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Button, Card, TextField, Typography, Box, Fade } from "@mui/material";
 import { useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(true);
+
+  const { login } = useAuth();
 
   // Handle transition between Login and Register
   const handleToggle = () => {
@@ -87,7 +90,9 @@ export default function LoginPage() {
               textTransform: "none",
               borderRadius: 2,
             }}
-            onClick={() => navigate("/topics")}
+            onClick={() => {
+              login("token");
+            }}
           >
             {isLogin ? "Login" : "Register"}
           </Button>

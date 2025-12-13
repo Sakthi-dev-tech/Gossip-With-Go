@@ -1,6 +1,7 @@
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth } from "../context/AuthContext";
 
 interface FloatingAppBarProps {
   username?: string;
@@ -10,10 +11,10 @@ interface FloatingAppBarProps {
 export default function FloatingAppBar({
   username = "User",
 }: FloatingAppBarProps) {
-  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    navigate("/login");
+    logout();
   };
 
   return (
