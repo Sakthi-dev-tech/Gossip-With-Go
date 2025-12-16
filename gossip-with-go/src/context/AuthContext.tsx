@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -20,9 +21,21 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-// Helper function to delete a cookie
+// Helper function to delete a cookie by setting the expiry date to the earliest possible time
 function deleteCookie(name: string): void {
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  document.cookie = `${name}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+// Helper function to check if a JWT token is expired
+function isTokenExpired(token: string): boolean {
+  try {
+    const decoded = jwtDecode<{ exp: number }>(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decoded.exp < currentTime;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return true; // If we can't decode it, treat it as expired
+  }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -37,8 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = getCookie("access_token");
 
     if (token) {
-      // Token exists, mark user as authenticated
-      setIsAuthenticated(true);
+      // Check if token is expired
+      if (isTokenExpired(token)) {
+        console.log("Token is expired, deleting cookie");
+        deleteCookie("access_token");
+        setIsAuthenticated(false);
+      } else {
+        // Token exists and is valid, mark user as authenticated
+        setIsAuthenticated(true);
+      }
     }
 
     setLoading(false);
