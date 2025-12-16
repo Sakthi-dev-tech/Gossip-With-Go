@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	appctx "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/context"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/json"
 )
 
@@ -21,6 +22,7 @@ func (h *handler) ListPosts(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		TopicId int64 `json:"topic_id"`
 	}
+
 	if err := json.Read(r, &data); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -49,6 +51,15 @@ func (h *handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// Get user ID from context
+	userID, ok := r.Context().Value(appctx.UserIDKey).(int64)
+	if !ok {
+		log.Println("userID not found in context")
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	createPostParams.UserID = userID
 
 	createdPost, err := h.service.CreatePost(r.Context(), createPostParams)
 	if err != nil {

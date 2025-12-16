@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	appctx "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/context"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/json"
 )
 
@@ -40,6 +41,15 @@ func (h *handler) CreateTopic(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// Get user ID from context
+	userID, ok := r.Context().Value(appctx.UserIDKey).(int64)
+	if !ok {
+		log.Println("userID not found in context")
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	createTopicsParams.UserID = userID
 
 	createdTopic, err := h.service.CreateTopic(r.Context(), createTopicsParams)
 	if err != nil {

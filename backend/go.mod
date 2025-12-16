@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/go-chi/cors v1.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6 // indirect
 )
 

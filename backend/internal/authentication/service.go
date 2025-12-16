@@ -49,10 +49,9 @@ func (s *svc) CreateUser(ctx context.Context, params repo.CreateUserParams) (rep
 			case pgerrcode.UniqueViolation:
 				return repo.User{}, fmt.Errorf("username already exists")
 			default:
-				return repo.User{}, fmt.Errorf("database error: %s", pgErr.Code)
+				return repo.User{}, fmt.Errorf("database error: %s", pgErr.Hint)
 			}
 		}
-		return repo.User{}, err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
@@ -62,10 +61,10 @@ func (s *svc) CreateUser(ctx context.Context, params repo.CreateUserParams) (rep
 	return user, nil
 }
 
-func (s *svc) LoginUser(ctx context.Context, username string, password string) (bool, error) {
+func (s *svc) LoginUser(ctx context.Context, username string, password string) (repo.User, error) {
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
-		return false, err
+		return repo.User{}, err
 	}
 	defer tx.Rollback(ctx)
 	qtx := s.repo.WithTx(tx)
@@ -73,19 +72,25 @@ func (s *svc) LoginUser(ctx context.Context, username string, password string) (
 	user, err := qtx.FetchUserByUsername(ctx, username)
 	if err != nil {
 		// Check if user doesn't exist
-		if err.Error() == "no rows in result set" {
-			return false, fmt.Errorf("user not found")
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.NoData:
+				return repo.User{}, fmt.Errorf("user not found")
+			default:
+				return repo.User{}, fmt.Errorf("database error: %s", pgErr.Hint)
+			}
 		}
-		return false, err
+		return repo.User{}, err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return false, err
+		return repo.User{}, err
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		return false, fmt.Errorf("invalid password")
+		return repo.User{}, fmt.Errorf("invalid password")
 	}
 
-	return true, nil
+	return user, nil
 }
