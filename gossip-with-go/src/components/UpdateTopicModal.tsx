@@ -13,16 +13,16 @@ import CloseIcon from "@mui/icons-material/Close";
 interface UpdateTopicModalProps {
   open: boolean;
   onClose: () => void;
-  topicId?: string;
+  topicId?: number;
   currentTitle?: string;
   currentDescription?: string;
-  onUpdate?: (topicId: string, title: string, description: string) => void;
+  onUpdate?: (topicId: number, title: string, description: string) => void;
 }
 
 export default function UpdateTopicModal({
   open,
   onClose,
-  topicId = "",
+  topicId,
   currentTitle = "",
   currentDescription = "",
   onUpdate,

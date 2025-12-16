@@ -14,7 +14,8 @@ interface TopicsBoxProps {
   description?: string;
   createdAt?: string;
   user_id: number;
-  topicId?: string;
+  topicId?: number;
+  onTopicChanged?: () => void;
 }
 
 // Interface for JWT payload
@@ -29,7 +30,8 @@ export default function TopicsBox({
   description,
   createdAt,
   user_id,
-  topicId = "",
+  topicId,
+  onTopicChanged,
 }: TopicsBoxProps) {
   const navigate = useNavigate();
   const [isOP, setIsOP] = useState(false);
@@ -61,18 +63,66 @@ export default function TopicsBox({
     setOpenDeleteModal(true);
   };
 
-  const handleUpdate = (
-    id: string,
+  const handleUpdate = async (
+    id: number,
     updatedTitle: string,
     updatedDescription: string
   ) => {
-    // TODO: Call API to update topic
-    console.log("Update topic:", id, updatedTitle, updatedDescription);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/updateTopic`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: updatedTitle,
+            description: updatedDescription,
+            id: id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        console.log("Update topic:", id, updatedTitle, updatedDescription);
+        // Notify parent to refresh topics list
+        if (onTopicChanged) {
+          onTopicChanged();
+        }
+      }
+    } catch (error) {
+      console.error("Error updating topic:", error);
+    }
   };
 
-  const handleDeleteConfirm = (id: string) => {
-    // TODO: Call API to delete topic
-    console.log("Delete topic:", id);
+  const handleDeleteConfirm = async (id: number) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/deleteTopic`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({
+            id: id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        console.log("Delete topic:", id);
+        // Notify parent to refresh topics list
+        if (onTopicChanged) {
+          onTopicChanged();
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting topic:", error);
+    }
   };
 
   return (

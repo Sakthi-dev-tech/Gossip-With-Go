@@ -13,15 +13,15 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 interface DeleteTopicModalProps {
   open: boolean;
   onClose: () => void;
-  topicId?: string;
+  topicId?: number;
   topicName?: string;
-  onDelete?: (topicId: string) => void;
+  onDelete?: (topicId: number) => void;
 }
 
 export default function DeleteTopicModal({
   open,
   onClose,
-  topicId = "",
+  topicId,
   topicName = "this topic",
   onDelete,
 }: DeleteTopicModalProps) {

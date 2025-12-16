@@ -9,16 +9,59 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
 
 interface CreateTopicModalProps {
   open: boolean;
   onClose: () => void;
+  onTopicCreated?: () => void;
 }
 
 export default function CreateTopicModal({
   open,
   onClose,
+  onTopicCreated,
 }: CreateTopicModalProps) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  async function handleCreateTopic(): Promise<void> {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/addTopic`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: title,
+            description: description,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        // Clear form
+        setTitle("");
+        setDescription("");
+
+        // Notify parent to refresh
+        if (onTopicCreated) {
+          onTopicCreated();
+        }
+
+        // Close modal
+        onClose();
+      } else {
+        console.error("Failed to create topic:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error creating topic:", error);
+    }
+  }
+
   return (
     <Dialog
       open={open}
@@ -75,6 +118,8 @@ export default function CreateTopicModal({
             placeholder="e.g., Best Practices for Go Concurrency"
             variant="outlined"
             size="small"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             sx={{
               mb: 3,
               "& .MuiOutlinedInput-root": {
@@ -114,6 +159,8 @@ export default function CreateTopicModal({
             rows={4}
             placeholder="Provide a brief summary of what this topic is about..."
             variant="outlined"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
@@ -156,8 +203,9 @@ export default function CreateTopicModal({
         </Button>
         <Button
           variant="contained"
+          onClick={handleCreateTopic}
           sx={{
-            backgroundColor: "secondary.main", // Orange secondary
+            backgroundColor: "secondary.main",
             textTransform: "none",
             fontWeight: 600,
             px: 3,

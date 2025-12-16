@@ -1,5 +1,4 @@
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";

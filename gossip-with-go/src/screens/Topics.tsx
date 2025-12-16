@@ -9,28 +9,31 @@ export default function TopicsPage() {
   const [openCreateTopic, setOpenCreateTopic] = useState<boolean>(false);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
 
-  useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/fetchTopics`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchTopics = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/fetchTopics`,
+        {
+          credentials: "include",
         }
+      );
 
-        const data = await response.json();
-        console.log("Data: ", data);
-        setAllTopics(data);
-      } catch (error) {
-        console.error("Failed to fetch topics:", error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
+      const data = await response.json();
+      if (data === null) {
+        return;
+      }
+      setAllTopics(data);
+    } catch (error) {
+      console.error("Failed to fetch topics:", error);
+    }
+  };
+
+  // fetch topics on first load
+  useEffect(() => {
     fetchTopics();
   }, []);
 
@@ -42,6 +45,7 @@ export default function TopicsPage() {
       <CreateTopicModal
         open={openCreateTopic}
         onClose={() => setOpenCreateTopic(false)}
+        onTopicCreated={fetchTopics}
       />
 
       {/* Main content area */}
@@ -79,11 +83,12 @@ export default function TopicsPage() {
             {allTopics.map((topic) => (
               <Grid size={6} key={topic.id}>
                 <TopicsBox
-                  topicId={topic.id.toString()}
+                  topicId={topic.id}
                   title={topic.name}
                   description={topic.description}
                   user_id={topic.user_id}
                   createdAt={topic.created_at}
+                  onTopicChanged={fetchTopics}
                 />
               </Grid>
             ))}
