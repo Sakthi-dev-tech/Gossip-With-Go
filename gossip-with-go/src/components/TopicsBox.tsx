@@ -12,7 +12,6 @@ export default function TopicsBox({
   title = "Latest Go 1.21 Features",
   description = "A deep dive into the new features and improvements in the latest version of Go.",
   createdAgo = "2 days ago",
-  postCount = 42,
 }: TopicsBoxProps) {
   const navigate = useNavigate();
 
@@ -81,7 +80,7 @@ export default function TopicsBox({
             fontSize: "0.85rem",
           }}
         >
-          Created: {createdAgo} • Posts: {postCount}
+          Created: {createdAgo}
         </Typography>
       </CardContent>
     </Card>

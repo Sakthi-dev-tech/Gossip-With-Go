@@ -42,8 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const apiUrl = process.env.REACT_APP_API_HOST;
-  const apiPort = process.env.REACT_APP_API_PORT;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     // Check if access_token cookie exists
@@ -68,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("Authenticating...");
 
     try {
-      const response = await fetch(`${apiUrl}:${apiPort}/login`, {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("Registering...");
 
     try {
-      const response = await fetch(`${apiUrl}:${apiPort}/register`, {
+      const response = await fetch(`${apiUrl}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

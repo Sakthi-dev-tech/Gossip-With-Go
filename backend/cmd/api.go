@@ -28,19 +28,25 @@ func ParseUserToken(tokenString string) (*UserClaims, error) {
 	// Get secret key from environment
 	secretKey := []byte(env.GetString("JWT_ENCRYPTION_KEY", ""))
 
+	// Validate that the secret key is not empty
+	if len(secretKey) == 0 {
+		return nil, fmt.Errorf("JWT_ENCRYPTION_KEY not found in environment")
+	}
+
 	// Parse the token with custom claims struct
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (any, error) {
-		// Validate the signing method to ensure token is valid
+		// Validate the signing method to ensure token uses HMAC
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method %v", token.Header["alg"])
+			return nil, fmt.Errorf("token signed with unexpected method: %v (expected HMAC)", token.Header["alg"])
 		}
 
-		// return the signing key used to sign the token
+		// Return the signing key - this is used to verify the token signature
+		// The jwt library will automatically verify the signature matches this key
 		return secretKey, nil
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	// extract and validate the claims
@@ -48,7 +54,7 @@ func ParseUserToken(tokenString string) (*UserClaims, error) {
 		return claims, nil
 	}
 
-	return nil, fmt.Errorf("invalid token")
+	return nil, fmt.Errorf("invalid token claims")
 }
 
 // Attach JWT authentication middleware to application

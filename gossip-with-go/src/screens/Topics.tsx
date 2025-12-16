@@ -2,10 +2,37 @@ import { Box, Button, Grid, Typography } from "@mui/material";
 import FloatingAppBar from "../components/FloatingAppBar";
 import TopicsBox from "../components/TopicsBox";
 import CreateTopicModal from "../components/CreateTopicModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Topic } from "../types/Topics";
 
 export default function TopicsPage() {
-  const [openCreateTopic, setOpenCreateTopic] = useState(false);
+  const [openCreateTopic, setOpenCreateTopic] = useState<boolean>(false);
+  const [allTopics, setAllTopics] = useState<Topic[]>([]);
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/fetchTopics`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Data: ", data);
+        setAllTopics(data);
+      } catch (error) {
+        console.error("Failed to fetch topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -49,69 +76,11 @@ export default function TopicsPage() {
 
         <Box sx={{ flexGrow: 1, px: 4 }}>
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-            <Grid size={6}>
-              <TopicsBox
-                title="Advanced Patterns"
-                description="Exploring advanced concurrency patterns in Go."
-                postCount={28}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Microservices with Go"
-                description="Building scalable microservices using Go and gRPC."
-                postCount={56}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Go Internals"
-                description="Understanding the Go runtime, garbage collector, and scheduler."
-                postCount={15}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Advanced Patterns"
-                description="Exploring advanced concurrency patterns in Go."
-                postCount={28}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Microservices with Go"
-                description="Building scalable microservices using Go and gRPC."
-                postCount={56}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Go Internals"
-                description="Understanding the Go runtime, garbage collector, and scheduler."
-                postCount={15}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Advanced Patterns"
-                description="Exploring advanced concurrency patterns in Go."
-                postCount={28}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Microservices with Go"
-                description="Building scalable microservices using Go and gRPC."
-                postCount={56}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TopicsBox
-                title="Go Internals"
-                description="Understanding the Go runtime, garbage collector, and scheduler."
-                postCount={15}
-              />
-            </Grid>
+            {allTopics.map((topic) => (
+              <Grid size={6}>
+                <TopicsBox title={topic.name} description={topic.description} />
+              </Grid>
+            ))}
           </Grid>
         </Box>
       </Box>
