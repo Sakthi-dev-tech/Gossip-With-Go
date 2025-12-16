@@ -10,6 +10,21 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper function to get a cookie by name
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(";").shift() || null;
+  }
+  return null;
+}
+
+// Helper function to delete a cookie
+function deleteCookie(name: string): void {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -18,10 +33,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const apiPort = process.env.REACT_APP_API_PORT;
 
   useEffect(() => {
-    const tk = localStorage.getItem("authToken");
+    // Check if access_token cookie exists
+    const token = getCookie("access_token");
 
-    if (tk) {
-      // TODO: check token validity
+    if (token) {
+      // Token exists, mark user as authenticated
       setIsAuthenticated(true);
     }
 
@@ -37,15 +53,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Important: Allow cookies to be sent/received
         body: JSON.stringify({ username, password }),
       });
 
       if (response.status === 200) {
-        const data = await response.json();
-        // Store token if backend returns one
-        if (data.token) {
-          localStorage.setItem("authToken", data.token);
-        }
+        await response.json();
         setIsAuthenticated(true);
         return "success";
       } else {
@@ -77,11 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.status === 200) {
-        const data = await response.json();
-        // Store token if backend returns one
-        if (data.token) {
-          localStorage.setItem("authToken", data.token);
-        }
+        await response.json();
+        // Backend sets the access_token cookie automatically
         setIsAuthenticated(true);
         return "success";
       } else {
@@ -99,6 +109,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     console.log("Logging out...");
+    // Delete the access_token cookie
+    deleteCookie("access_token");
     setIsAuthenticated(false);
   };
 
