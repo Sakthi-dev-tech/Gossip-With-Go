@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
@@ -55,19 +54,18 @@ func ParseUserToken(tokenString string) (*UserClaims, error) {
 // Attach JWT authentication middleware to application
 func JWTAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract token from Authorization Header
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, "missing authorisation header", http.StatusUnauthorized)
+		// Retrieve token from cookie
+		cookie, err := r.Cookie("access_token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				http.Error(w, "missing authorisation header", http.StatusUnauthorized)
+				return
+			}
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
-		// Since expected format is "Bearer <token>"
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader { // if nothing changed
-			http.Error(w, "invalid authorisation header", http.StatusUnauthorized)
-			return
-		}
+		tokenString := cookie.Value
 
 		// Parse and validates the token
 		claims, err := ParseUserToken(tokenString)

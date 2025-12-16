@@ -90,10 +90,19 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Returns the JWT token to save in frontend
-	response := map[string]string{
-		"token": token,
+	cookie := http.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		HttpOnly: false, // TODO: Set this to true for production for security
+		Secure:   false, // TODO: Set this to true for production for security
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
 	}
 
-	json.Write(w, http.StatusOK, response)
+	// set cookie in response header
+	http.SetCookie(w, &cookie)
+	json.Write(w, http.StatusOK, map[string]string{
+		"message": "Success",
+	})
 }
