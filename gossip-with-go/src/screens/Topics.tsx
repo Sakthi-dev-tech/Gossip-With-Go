@@ -77,8 +77,14 @@ export default function TopicsPage() {
         <Box sx={{ flexGrow: 1, px: 4 }}>
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
             {allTopics.map((topic) => (
-              <Grid size={6}>
-                <TopicsBox title={topic.name} description={topic.description} />
+              <Grid size={6} key={topic.id}>
+                <TopicsBox
+                  topicId={topic.id.toString()}
+                  title={topic.name}
+                  description={topic.description}
+                  user_id={topic.user_id}
+                  createdAt={topic.created_at}
+                />
               </Grid>
             ))}
           </Grid>

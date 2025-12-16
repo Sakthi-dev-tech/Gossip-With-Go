@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { deleteCookie, getCookie } from "../functions/Cookies";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -10,21 +11,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Helper function to get a cookie by name
-function getCookie(name: string): string | null {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    return parts.pop()?.split(";").shift() || null;
-  }
-  return null;
-}
-
-// Helper function to delete a cookie by setting the expiry date to the earliest possible time
-function deleteCookie(name: string): void {
-  document.cookie = `${name}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-}
 
 // Helper function to check if a JWT token is expired
 function isTokenExpired(token: string): boolean {

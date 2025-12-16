@@ -2,16 +2,43 @@ import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getCookie } from "../functions/Cookies";
 
 interface FloatingAppBarProps {
   username?: string;
 }
 
-// TODO: Pass in a username from the login page
+// Interface for JWT payload
+interface JWTPayload {
+  userID: number;
+  username: string;
+  exp: number;
+}
+
 export default function FloatingAppBar({
-  username = "User",
+  username: usernameProp,
 }: FloatingAppBarProps) {
   const { logout } = useAuth();
+  const [username, setUsername] = useState<string>(usernameProp || "Gossiper");
+
+  useEffect(() => {
+    // Get JWT token from access_token cookie
+    const token = getCookie("access_token");
+    if (token) {
+      try {
+        // Decode the JWT token to get the username
+        const decoded = jwtDecode<JWTPayload>(token);
+        if (decoded.username) {
+          setUsername(decoded.username);
+        }
+      } catch (error) {
+        console.error("Error decoding JWT token:", error);
+        // Fall back to prop or default if token can't be decoded
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     logout();

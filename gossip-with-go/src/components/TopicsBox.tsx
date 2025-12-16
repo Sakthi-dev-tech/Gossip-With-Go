@@ -1,88 +1,213 @@
-import { Typography, Card, CardContent } from "@mui/material";
+import { Typography, Card, CardContent, Box, IconButton } from "@mui/material";
 import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getCookie } from "../functions/Cookies";
+import { getRelativeTime } from "../functions/TimeFormatter";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpdateTopicModal from "./UpdateTopicModal";
+import DeleteTopicModal from "./DeleteTopicModal";
 
 interface TopicsBoxProps {
   title?: string;
   description?: string;
-  createdAgo?: string;
-  postCount?: number;
+  createdAt?: string;
+  user_id: number;
+  topicId?: string;
+}
+
+// Interface for JWT payload
+interface JWTPayload {
+  user_id: number;
+  username: string;
+  exp: number;
 }
 
 export default function TopicsBox({
-  title = "Latest Go 1.21 Features",
-  description = "A deep dive into the new features and improvements in the latest version of Go.",
-  createdAgo = "2 days ago",
+  title,
+  description,
+  createdAt,
+  user_id,
+  topicId = "",
 }: TopicsBoxProps) {
   const navigate = useNavigate();
+  const [isOP, setIsOP] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  useEffect(() => {
+    // Get JWT token from access_token cookie
+    const token = getCookie("access_token");
+    if (token) {
+      try {
+        // Decode the JWT token to get the userID
+        const decoded = jwtDecode<JWTPayload>(token);
+        // Check if the current user is the OP of this topic
+        setIsOP(decoded.user_id === user_id);
+      } catch (error) {
+        console.error("Error decoding JWT token:", error);
+      }
+    }
+  }, [user_id]);
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click navigation
+    setOpenUpdateModal(true);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click navigation
+    setOpenDeleteModal(true);
+  };
+
+  const handleUpdate = (
+    id: string,
+    updatedTitle: string,
+    updatedDescription: string
+  ) => {
+    // TODO: Call API to update topic
+    console.log("Update topic:", id, updatedTitle, updatedDescription);
+  };
+
+  const handleDeleteConfirm = (id: string) => {
+    // TODO: Call API to delete topic
+    console.log("Delete topic:", id);
+  };
 
   return (
-    <Card
-      sx={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "rgba(30, 41, 59, 0.7)",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
-        borderRadius: 4,
-        padding: 3,
-        boxSizing: "border-box",
-        transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
-          border: "1px solid rgba(74, 144, 226, 0.3)",
-        },
-      }}
-      elevation={0}
-      onClick={() => navigate("/posts")}
-    >
-      <CardContent
+    <>
+      <Card
         sx={{
-          flex: 1,
+          width: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
-          padding: "0 !important",
-          gap: 2,
-          justifyContent: "center",
+          backgroundColor: "rgba(30, 41, 59, 0.7)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: 4,
+          padding: 3,
+          boxSizing: "border-box",
+          transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+          position: "relative",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+            border: "1px solid rgba(74, 144, 226, 0.3)",
+          },
         }}
+        elevation={0}
+        onClick={() => navigate("/posts")}
       >
-        <Typography
-          variant="h5"
-          component="h2"
-          sx={{
-            fontWeight: 700,
-            color: "text.primary",
-            lineHeight: 1.2,
-          }}
-        >
-          {title}
-        </Typography>
+        {/* Edit and Delete Icons - Only visible if user is owner */}
+        {isOP && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              display: "flex",
+              gap: 1,
+            }}
+          >
+            <IconButton
+              size="small"
+              onClick={handleEdit}
+              sx={{
+                backgroundColor: "rgba(74, 144, 226, 0.2)",
+                color: "primary.main",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "rgba(74, 144, 226, 0.4)",
+                  transform: "scale(1.1)",
+                },
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={handleDelete}
+              sx={{
+                backgroundColor: "rgba(239, 68, 68, 0.2)",
+                color: "error.main",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "rgba(239, 68, 68, 0.4)",
+                  transform: "scale(1.1)",
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        )}
 
-        <Typography
-          variant="body1"
+        <CardContent
           sx={{
-            color: "text.secondary",
             flex: 1,
-            lineHeight: 1.6,
+            display: "flex",
+            flexDirection: "column",
+            padding: "0 !important",
+            gap: 2,
+            justifyContent: "center",
           }}
         >
-          {description}
-        </Typography>
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: 700,
+              color: "text.primary",
+              lineHeight: 1.2,
+            }}
+          >
+            {title}
+          </Typography>
 
-        <Typography
-          variant="caption"
-          sx={{
-            color: "secondary.main",
-            fontWeight: 600,
-            mt: 2,
-            display: "block",
-            fontSize: "0.85rem",
-          }}
-        >
-          Created: {createdAgo}
-        </Typography>
-      </CardContent>
-    </Card>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              flex: 1,
+              lineHeight: 1.6,
+            }}
+          >
+            {description}
+          </Typography>
+
+          <Typography
+            variant="caption"
+            sx={{
+              color: "secondary.main",
+              fontWeight: 600,
+              mt: 2,
+              display: "block",
+              fontSize: "0.85rem",
+            }}
+          >
+            Created: {createdAt ? getRelativeTime(createdAt) : "recently"}
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Modals */}
+      <UpdateTopicModal
+        open={openUpdateModal}
+        onClose={() => setOpenUpdateModal(false)}
+        topicId={topicId}
+        currentTitle={title}
+        currentDescription={description}
+        onUpdate={handleUpdate}
+      />
+
+      <DeleteTopicModal
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        topicId={topicId}
+        topicName={title}
+        onDelete={handleDeleteConfirm}
+      />
+    </>
   );
 }

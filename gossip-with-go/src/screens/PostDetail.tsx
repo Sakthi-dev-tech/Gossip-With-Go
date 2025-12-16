@@ -10,6 +10,7 @@ import {
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Link as RouterLink } from "react-router-dom";
 import FloatingAppBar from "../components/FloatingAppBar";
+import CommentBox from "../components/CommentBox";
 
 export default function PostDetailPage() {
   return (
@@ -183,62 +184,20 @@ export default function PostDetailPage() {
           {/* Comment List */}
 
           {/* Comment 1 */}
-          <Box
-            sx={{
-              backgroundColor: "rgba(30, 41, 59, 0.4)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: 3,
-              p: 3,
-              mb: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              {/* Fallback avatar if no image */}
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 700, fontSize: "0.95rem" }}
-              >
-                JaneSmith
-              </Typography>
-            </Box>
-            <Typography
-              variant="body1"
-              sx={{ color: "text.secondary", lineHeight: 1.6 }}
-            >
-              Great overview! I'm really excited about the new 'slices' package.
-              It's going to clean up so much of my code.
-            </Typography>
-          </Box>
+          <CommentBox
+            commentId="1"
+            author="JaneSmith"
+            content="Great overview! I'm really excited about the new 'slices' package. It's going to clean up so much of my code."
+            isOwner={true}
+          />
 
           {/* Comment 2 */}
-          <Box
-            sx={{
-              backgroundColor: "rgba(30, 41, 59, 0.4)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: 3,
-              p: 3,
-              mb: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 700, fontSize: "0.95rem" }}
-              >
-                CodeWizard
-              </Typography>
-            </Box>
-            <Typography
-              variant="body1"
-              sx={{ color: "text.secondary", lineHeight: 1.6 }}
-            >
-              I've been testing the new PGO (Profile Guided Optimization)
-              features and the results are promising. Definitely worth looking
-              into for production workloads.
-            </Typography>
-          </Box>
+          <CommentBox
+            commentId="2"
+            author="CodeWizard"
+            content="I've been testing the new PGO (Profile Guided Optimization) features and the results are promising. Definitely worth looking into for production workloads."
+            isOwner={false}
+          />
         </Box>
       </Box>
     </Box>
