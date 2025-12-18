@@ -60,6 +60,15 @@ func (h *handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 	createCommentParams.UserID = userID
 
+	// Get username from context
+	username, ok := r.Context().Value(appctx.UsernameKey).(string)
+	if !ok {
+		log.Println("username not found in context")
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	createCommentParams.Username = username
+
 	createdComment, err := h.service.CreateComment(r.Context(), createCommentParams)
 	if err != nil {
 		log.Println(err)

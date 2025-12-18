@@ -12,6 +12,7 @@ type Comment struct {
 	ID        int64            `json:"id"`
 	Content   string           `json:"content"`
 	UserID    int64            `json:"user_id"`
+	Username  string           `json:"username"`
 	PostID    int64            `json:"post_id"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 }
@@ -21,6 +22,7 @@ type Post struct {
 	Title     string           `json:"title"`
 	Content   string           `json:"content"`
 	UserID    int64            `json:"user_id"`
+	Username  string           `json:"username"`
 	TopicID   int64            `json:"topic_id"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 }
@@ -30,6 +32,7 @@ type Topic struct {
 	Name        string           `json:"name"`
 	Description string           `json:"description"`
 	UserID      int64            `json:"user_id"`
+	Username    string           `json:"username"`
 	CreatedAt   pgtype.Timestamp `json:"created_at"`
 }
 

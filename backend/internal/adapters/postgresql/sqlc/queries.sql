@@ -11,13 +11,13 @@ SELECT * FROM comments WHERE post_id = $1;
 SELECT * FROM users WHERE username = $1;
 
 -- name: CreateTopic :one
-INSERT INTO topics (name, description, user_id) VALUES ($1, $2, $3) RETURNING *;
+INSERT INTO topics (name, description, user_id, username) VALUES ($1, $2, $3, $4) RETURNING *;
 
 -- name: CreatePost :one
-INSERT INTO posts (title, content, topic_id, user_id) VALUES ($1, $2, $3, $4) RETURNING *;
+INSERT INTO posts (title, content, topic_id, user_id, username) VALUES ($1, $2, $3, $4, $5) RETURNING *;
 
 -- name: CreateComment :one
-INSERT INTO comments (content, post_id, user_id) VALUES ($1, $2, $3) RETURNING *;
+INSERT INTO comments (content, post_id, user_id, username) VALUES ($1, $2, $3, $4) RETURNING *;
 
 -- name: CreateUser :one
 INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *;

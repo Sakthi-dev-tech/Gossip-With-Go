@@ -51,6 +51,15 @@ func (h *handler) CreateTopic(w http.ResponseWriter, r *http.Request) {
 	}
 	createTopicsParams.UserID = userID
 
+	// Get username from context
+	username, ok := r.Context().Value(appctx.UsernameKey).(string)
+	if !ok {
+		log.Println("username not found in context")
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	createTopicsParams.Username = username
+
 	createdTopic, err := h.service.CreateTopic(r.Context(), createTopicsParams)
 	if err != nil {
 		log.Println(err)

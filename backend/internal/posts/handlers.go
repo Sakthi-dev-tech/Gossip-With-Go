@@ -61,6 +61,15 @@ func (h *handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	createPostParams.UserID = userID
 
+	// Get username from context
+	username, ok := r.Context().Value(appctx.UsernameKey).(string)
+	if !ok {
+		log.Println("username not found in context")
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	createPostParams.Username = username
+
 	createdPost, err := h.service.CreatePost(r.Context(), createPostParams)
 	if err != nil {
 		log.Println(err)
