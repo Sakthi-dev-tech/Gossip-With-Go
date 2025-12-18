@@ -5,23 +5,33 @@ import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
 import { Link as RouterLink, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Post } from "../types/Posts";
 
 export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: 1,
-      title: "Hello World",
-      content: "This is a post",
-      user_id: 1,
-      username: "GoDeveloper",
-      created_at: "2025-12-18T20:20:20.000Z",
-    }
-  ])
+  const [posts, setPosts] = useState<Post[]>([])
   const location = useLocation();
-  const {topicId} = location.state;
+  const {topicId, title, description} = location.state;
+
+  const fetchPosts = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/fetchPosts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ topic_id: topicId }),
+      credentials: "include",
+    });
+    const data = await response.json();
+    if (data !== null) {
+      setPosts(data);
+    } 
+  }
+
+  useEffect(() => {
+    fetchPosts();
+  }, [openCreatePost])
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -30,6 +40,7 @@ export default function PostsPage() {
         open={openCreatePost}
         onClose={() => setOpenCreatePost(false)}
         topicName="Go Language"
+        topicId={topicId}
       />
 
       {/* Main Content */}
@@ -53,7 +64,7 @@ export default function PostsPage() {
           >
             Topics
           </Link>
-          <Typography color="text.primary">Go Language</Typography>
+          <Typography color="text.primary">{title}</Typography>
         </Breadcrumbs>
 
         {/* Header Section */}
@@ -71,14 +82,13 @@ export default function PostsPage() {
               component="h1"
               sx={{ fontWeight: 800, mb: 1, letterSpacing: "-1px" }}
             >
-              Go Language
+              {title}
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "text.secondary", fontSize: "1.1rem" }}
             >
-              A place to discuss all things related to the Go programming
-              language.
+              {description}
             </Typography>
           </Box>
 

@@ -138,7 +138,7 @@ func (app *application) mount() http.Handler {
 
 		postService := posts.NewService(repo.New(app.db), app.db)
 		postsHandler := posts.NewHandler(postService)
-		r.Get("/fetchPosts", postsHandler.ListPosts)
+		r.Post("/fetchPosts", postsHandler.ListPosts)
 		r.Post("/addPost", postsHandler.CreatePost)
 		r.Put("/updatePost", postsHandler.UpdatePost)
 		r.Delete("/deletePost", postsHandler.DeletePost)

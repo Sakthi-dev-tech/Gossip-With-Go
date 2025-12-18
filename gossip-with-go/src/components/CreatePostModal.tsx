@@ -9,18 +9,42 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
 
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
   topicName?: string;
+  topicId: number;
 }
 
 export default function CreatePostModal({
   open,
   onClose,
-  topicName = "General",
+  topicName,
+  topicId
 }: CreatePostModalProps) {
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  async function createPost() {
+    await fetch(`${process.env.REACT_APP_API_URL}/addPost`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "title": title,
+        "content":content,
+        "topic_id": topicId
+      }),
+      credentials: "include",
+    });
+
+    onClose();
+  }
+
   return (
     <Dialog
       open={open}
@@ -29,7 +53,7 @@ export default function CreatePostModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          backgroundColor: "#111827", // Dark background
+          backgroundColor: "#111827",
           backgroundImage: "none",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -86,22 +110,25 @@ export default function CreatePostModal({
             placeholder="e.g., What's new in the latest Go release?"
             variant="outlined"
             size="small"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             sx={{
               mb: 3,
-              "& .MuiOutlinedInput-root": {
+              // Target the root container of the OutlinedInput
+              "& .MuiOutlinedInput-root": { 
                 borderRadius: 2,
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
-                color: "white",
-                "& fieldset": {
-                  borderColor: "rgba(255, 255, 255, 0.1)",
-                },
+                color: "white", // text colour
+                // Target the border on hover
                 "&:hover fieldset": {
                   borderColor: "rgba(255, 255, 255, 0.2)",
                 },
+                // Target the border when the input is focused
                 "&.Mui-focused fieldset": {
                   borderColor: "secondary.main",
                 },
               },
+              // Style the placeholder text
               "& input::placeholder": {
                 color: "rgba(255, 255, 255, 0.3)",
               },
@@ -125,14 +152,13 @@ export default function CreatePostModal({
             rows={4}
             placeholder="Share your thoughts, details, and links here..."
             variant="outlined"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 color: "white",
-                "& fieldset": {
-                  borderColor: "rgba(255, 255, 255, 0.1)",
-                },
                 "&:hover fieldset": {
                   borderColor: "rgba(255, 255, 255, 0.2)",
                 },
@@ -167,8 +193,9 @@ export default function CreatePostModal({
         </Button>
         <Button
           variant="contained"
+          onClick={createPost}
           sx={{
-            backgroundColor: "secondary.main", // Orange secondary
+            backgroundColor: "secondary.main",
             textTransform: "none",
             fontWeight: 600,
             px: 3,

@@ -152,7 +152,7 @@ export default function TopicsBox({
         onClick={() => navigate(
           "/posts",
           {
-            state: { topicId }
+            state: { topicId, title, description }
           }
         )}
       >
