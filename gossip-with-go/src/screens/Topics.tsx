@@ -87,6 +87,7 @@ export default function TopicsPage() {
                   title={topic.name}
                   description={topic.description}
                   user_id={topic.user_id}
+                  username={topic.username}
                   createdAt={topic.created_at}
                   onTopicChanged={fetchTopics}
                 />

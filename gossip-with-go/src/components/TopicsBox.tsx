@@ -14,6 +14,7 @@ interface TopicsBoxProps {
   description?: string;
   createdAt?: string;
   user_id: number;
+  username: string;
   topicId?: number;
   onTopicChanged?: () => void;
 }
@@ -30,6 +31,7 @@ export default function TopicsBox({
   description,
   createdAt,
   user_id,
+  username,
   topicId,
   onTopicChanged,
 }: TopicsBoxProps) {
@@ -241,7 +243,8 @@ export default function TopicsBox({
               fontSize: "0.85rem",
             }}
           >
-            Created: {createdAt ? getRelativeTime(createdAt) : "recently"}
+            Created by {username} •{" "}
+            {createdAt ? getRelativeTime(createdAt) : "recently"}
           </Typography>
         </CardContent>
       </Card>

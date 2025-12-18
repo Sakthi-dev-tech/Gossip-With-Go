@@ -16,7 +16,8 @@ export default function PostsPage() {
       title: "Hello World",
       content: "This is a post",
       user_id: 1,
-      created_at: "2025-12-18T20:48:19.000Z",
+      username: "GoDeveloper",
+      created_at: "2025-12-18T20:20:20.000Z",
     }
   ])
   const location = useLocation();

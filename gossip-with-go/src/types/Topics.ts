@@ -3,5 +3,6 @@ export interface Topic {
   name: string;
   description: string;
   user_id: number;
+  username: string;
   created_at: string;
 }

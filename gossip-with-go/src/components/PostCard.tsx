@@ -5,9 +5,7 @@ import {
   Typography,
   IconButton,
   Button,
-  Avatar,
   Chip,
-  useTheme,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,7 +25,6 @@ interface PostCardProps {
 
 export default function PostCard({ post, topicName }: PostCardProps) {
   const navigate = useNavigate();
-  const theme = useTheme();
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -72,18 +69,8 @@ export default function PostCard({ post, topicName }: PostCardProps) {
         <CardContent sx={{ p: 3.5, "&:last-child": { pb: 3.5 } }}>
           {/* Header: Author & Meta */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2.5 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Avatar
-                sx={{
-                  bgcolor: theme.palette.primary.main,
-                  width: 40,
-                  height: 40,
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {post.user_id.toString().slice(0, 2)}
-              </Avatar>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -93,7 +80,7 @@ export default function PostCard({ post, topicName }: PostCardProps) {
                     lineHeight: 1.2,
                   }}
                 >
-                  Member #{post.user_id}
+                  {post.username}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   <AccessTimeIcon
@@ -124,7 +111,6 @@ export default function PostCard({ post, topicName }: PostCardProps) {
             )}
           </Box>
 
-          {/* Content Section */}
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="h5"
@@ -155,7 +141,6 @@ export default function PostCard({ post, topicName }: PostCardProps) {
             </Typography>
           </Box>
 
-          {/* Footer Actions */}
           <Box
             sx={{
               display: "flex",
@@ -167,7 +152,7 @@ export default function PostCard({ post, topicName }: PostCardProps) {
           >
             <Button
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate(`/post/${post.id}`)}
+              onClick={() => navigate(`/post`, { state: { post_id: post.id } })}
               sx={{
                 color: "secondary.main",
                 fontWeight: 600,
@@ -186,7 +171,7 @@ export default function PostCard({ post, topicName }: PostCardProps) {
             <Box
               className="action-buttons"
               sx={{
-                opacity: { xs: 1, md: 0.7 }, // Always visible on mobile
+                opacity: { xs: 1, md: 0.7 },
                 transition: "opacity 0.2s",
                 display: "flex",
                 gap: 1,
