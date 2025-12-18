@@ -4,35 +4,30 @@ import {
   CardContent,
   Typography,
   IconButton,
-  Link,
+  Button,
+  Avatar,
+  Chip,
+  useTheme,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import UpdatePostModal from "./UpdatePostModal";
 import DeletePostModal from "./DeletePostModal";
+import { Post } from "../types/Posts";
+import { getRelativeTime } from "../functions/TimeFormatter";
 
 interface PostCardProps {
-  author: string;
-  timeAgo: string;
-  title: string;
-  content: string;
-  commentCount: number;
-  postId?: string;
+  post: Post;
   topicName?: string;
 }
 
-export default function PostCard({
-  author,
-  timeAgo,
-  title,
-  content,
-  commentCount,
-  postId = "",
-  topicName,
-}: PostCardProps) {
+export default function PostCard({ post, topicName }: PostCardProps) {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -49,62 +44,116 @@ export default function PostCard({
     // TODO: Call API to delete post
     console.log("Delete post:", id);
   };
+
+  const formattedDate = getRelativeTime(post.created_at);
+
   return (
     <>
       <Card
         sx={{
-          backgroundColor: "rgba(30, 41, 59, 0.4)",
-          backdropFilter: "blur(10px)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          borderRadius: 3,
-          mb: 2,
-          transition: "transform 0.2s, box-shadow 0.2s",
+          backgroundColor: "rgba(30, 41, 59, 0.6)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: 4,
+          mb: 3,
+          overflow: "visible",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           "&:hover": {
-            boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
+            transform: "translateY(-4px)",
+            boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            "& .action-buttons": {
+              opacity: 1,
+            },
           },
         }}
         elevation={0}
       >
-        <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
-          {/* Author and Time */}
-          <Typography
-            variant="caption"
-            sx={{
-              color: "text.secondary",
-              display: "block",
-              mb: 1,
-              fontSize: "0.85rem",
-            }}
-          >
-            {author} • {timeAgo}
-          </Typography>
+        <CardContent sx={{ p: 3.5, "&:last-child": { pb: 3.5 } }}>
+          {/* Header: Author & Meta */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Avatar
+                sx={{
+                  bgcolor: theme.palette.primary.main,
+                  width: 40,
+                  height: 40,
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {post.user_id.toString().slice(0, 2)}
+              </Avatar>
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 700,
+                    color: "text.primary",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Member #{post.user_id}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <AccessTimeIcon
+                    sx={{ fontSize: "0.85rem", color: "text.secondary" }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary", fontWeight: 500 }}
+                  >
+                    {formattedDate}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
 
-          {/* Title */}
-          <Typography
-            variant="h6"
-            component="h3"
-            sx={{
-              fontWeight: 700,
-              color: "text.primary",
-              mb: 1,
-              fontSize: "1.25rem",
-            }}
-          >
-            {title}
-          </Typography>
+            {topicName && (
+              <Chip
+                label={topicName}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  color: "text.secondary",
+                  borderRadius: "8px",
+                  height: 24,
+                  fontSize: "0.75rem",
+                }}
+              />
+            )}
+          </Box>
 
-          {/* Content Preview */}
-          <Typography
-            variant="body1"
-            sx={{
-              color: "text.secondary",
-              mb: 3,
-              lineHeight: 1.6,
-            }}
-          >
-            {content}
-          </Typography>
+          {/* Content Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="h5"
+              component="h3"
+              sx={{
+                fontWeight: 800,
+                color: "text.primary",
+                mb: 1.5,
+                lineHeight: 1.3,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {post.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: "text.secondary",
+                lineHeight: 1.7,
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {post.content}
+            </Typography>
+          </Box>
 
           {/* Footer Actions */}
           <Box
@@ -112,34 +161,49 @@ export default function PostCard({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              pt: 2,
+              borderTop: "1px solid rgba(255, 255, 255, 0.08)",
             }}
           >
-            <Link
-              component="button"
-              underline="none"
+            <Button
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => navigate(`/post/${post.id}`)}
               sx={{
                 color: "secondary.main",
                 fontWeight: 600,
-                fontSize: "0.9rem",
+                textTransform: "none",
+                p: 0,
                 "&:hover": {
+                  bgcolor: "transparent",
+                  color: "secondary.light",
                   textDecoration: "underline",
                 },
               }}
-              onClick={() => {
-                navigate(`/post`);
+            >
+              Read full post
+            </Button>
+
+            <Box
+              className="action-buttons"
+              sx={{
+                opacity: { xs: 1, md: 0.7 }, // Always visible on mobile
+                transition: "opacity 0.2s",
+                display: "flex",
+                gap: 1,
               }}
             >
-              Read Comments ({commentCount})
-            </Link>
-
-            <Box>
               <IconButton
                 size="small"
                 onClick={() => setOpenUpdateModal(true)}
                 sx={{
                   color: "text.secondary",
-                  mr: 1,
-                  "&:hover": { color: "text.primary" },
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: 2,
+                  "&:hover": {
+                    color: "primary.main",
+                    borderColor: "primary.main",
+                    bgcolor: "rgba(56, 189, 248, 0.08)",
+                  },
                 }}
               >
                 <EditIcon fontSize="small" />
@@ -149,7 +213,13 @@ export default function PostCard({
                 onClick={() => setOpenDeleteModal(true)}
                 sx={{
                   color: "text.secondary",
-                  "&:hover": { color: "error.main" },
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: 2,
+                  "&:hover": {
+                    color: "error.main",
+                    borderColor: "error.main",
+                    bgcolor: "rgba(239, 68, 68, 0.08)",
+                  },
                 }}
               >
                 <DeleteIcon fontSize="small" />
@@ -163,9 +233,9 @@ export default function PostCard({
       <UpdatePostModal
         open={openUpdateModal}
         onClose={() => setOpenUpdateModal(false)}
-        postId={postId}
-        currentTitle={title}
-        currentContent={content}
+        postId={post.id.toString()}
+        currentTitle={post.title}
+        currentContent={post.content}
         topicName={topicName}
         onUpdate={handleUpdate}
       />
@@ -173,8 +243,8 @@ export default function PostCard({
       <DeletePostModal
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
-        postId={postId}
-        postTitle={title}
+        postId={post.id.toString()}
+        postTitle={post.title}
         onDelete={handleDeleteConfirm}
       />
     </>

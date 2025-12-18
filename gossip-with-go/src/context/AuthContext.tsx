@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Important: Allow cookies to be sent/received
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 

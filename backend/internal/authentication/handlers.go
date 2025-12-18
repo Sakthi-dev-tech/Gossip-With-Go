@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/env"
 	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/json"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5"
 )
 
 func NewHandler(service Service) *handler {
@@ -77,6 +79,12 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(err)
+
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

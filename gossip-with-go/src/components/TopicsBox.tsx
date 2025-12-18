@@ -147,7 +147,12 @@ export default function TopicsBox({
           },
         }}
         elevation={0}
-        onClick={() => navigate("/posts")}
+        onClick={() => navigate(
+          "/posts",
+          {
+            state: { topicId }
+          }
+        )}
       >
         {/* Edit and Delete Icons - Only visible if user is owner */}
         {isOP && (

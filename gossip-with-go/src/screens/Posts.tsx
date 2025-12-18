@@ -4,40 +4,23 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { Post } from "../types/Posts";
 
 export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
-  const posts = [
+  const [posts, setPosts] = useState<Post[]>([
     {
       id: 1,
-      author: "John Doe",
-      timeAgo: "2 hours ago",
-      title: "Best Practices for Concurrency in Go",
-      content:
-        "Let's discuss some of the best practices and common pitfalls when dealing with goroutines and channels in Go. What are your favorite patterns and techniques for writing clean, efficient, and bug-free concurrent code?...",
-      commentCount: 14,
-    },
-    {
-      id: 2,
-      author: "Sarah Smith",
-      timeAgo: "1 day ago",
-      title: "Understanding Go's Error Handling Philosophy",
-      content:
-        "Coming from other languages, Go's explicit `if err != nil` pattern can feel verbose. I'd love to hear how others have embraced this and what the community thinks about the proposals for new error handling mechanisms.",
-      commentCount: 32,
-    },
-    {
-      id: 3,
-      author: "Mike Chen",
-      timeAgo: "3 days ago",
-      title: "Showcase: A CLI Tool I Built with Cobra",
-      content:
-        "Just wanted to share a small project I built using the Cobra library for creating powerful CLI applications. It was a fantastic experience, and I'm open to feedback and questions about the development process!",
-      commentCount: 8,
-    },
-  ];
+      title: "Hello World",
+      content: "This is a post",
+      user_id: 1,
+      created_at: "2025-12-18T20:48:19.000Z",
+    }
+  ])
+  const location = useLocation();
+  const {topicId} = location.state;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -125,11 +108,7 @@ export default function PostsPage() {
           {posts.map((post) => (
             <PostCard
               key={post.id}
-              author={post.author}
-              timeAgo={post.timeAgo}
-              title={post.title}
-              content={post.content}
-              commentCount={post.commentCount}
+              post={post}
             />
           ))}
         </Box>
