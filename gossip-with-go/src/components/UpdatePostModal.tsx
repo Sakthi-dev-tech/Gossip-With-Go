@@ -9,36 +9,33 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
 
 interface UpdatePostModalProps {
   open: boolean;
   onClose: () => void;
-  postId?: string;
-  currentTitle?: string;
-  currentContent?: string;
-  topicName?: string;
-  onUpdate?: (postId: string, title: string, content: string) => void;
+  postId: number;
+  currentTitle: string;
+  currentContent: string;
+  topicName: string;
+  onUpdate: (postId: number, title: string, content: string) => void;
 }
 
 export default function UpdatePostModal({
   open,
   onClose,
-  postId = "",
-  currentTitle = "",
-  currentContent = "",
+  postId,
+  currentTitle,
+  currentContent,
   topicName,
   onUpdate,
 }: UpdatePostModalProps) {
+
+  const [title, setTitle] = useState(currentTitle);
+  const [content, setContent] = useState(currentContent);
+  
   const handleUpdate = () => {
-    if (onUpdate && postId) {
-      const title =
-        (document.getElementById("post-title") as HTMLInputElement)?.value ||
-        "";
-      const content =
-        (document.getElementById("post-content") as HTMLInputElement)?.value ||
-        "";
-      onUpdate(postId, title, content);
-    }
+    onUpdate(postId, title, content);
     onClose();
   };
 
@@ -50,7 +47,7 @@ export default function UpdatePostModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          backgroundColor: "#111827", // Dark background
+          backgroundColor: "#111827", 
           backgroundImage: "none",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -105,10 +102,11 @@ export default function UpdatePostModal({
           <TextField
             id="post-title"
             fullWidth
-            defaultValue={currentTitle}
             placeholder="e.g., What's new in the latest Go release?"
             variant="outlined"
             size="small"
+            onChange={(e) => setTitle(e.target.value)}
+            value={title}
             sx={{
               mb: 3,
               "& .MuiOutlinedInput-root": {
@@ -147,9 +145,10 @@ export default function UpdatePostModal({
             fullWidth
             multiline
             rows={4}
-            defaultValue={currentContent}
             placeholder="Share your thoughts, details, and links here..."
             variant="outlined"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,

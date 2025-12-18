@@ -39,7 +39,7 @@ export default function PostsPage() {
       <CreatePostModal
         open={openCreatePost}
         onClose={() => setOpenCreatePost(false)}
-        topicName="Go Language"
+        topicName={title}
         topicId={topicId}
       />
 
@@ -120,6 +120,7 @@ export default function PostsPage() {
             <PostCard
               key={post.id}
               post={post}
+              onPostChanged={fetchPosts}
             />
           ))}
         </Box>

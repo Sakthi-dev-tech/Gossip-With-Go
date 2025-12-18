@@ -5,7 +5,6 @@ import {
   Typography,
   IconButton,
   Button,
-  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,33 +12,75 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import UpdatePostModal from "./UpdatePostModal";
 import DeletePostModal from "./DeletePostModal";
 import { Post } from "../types/Posts";
 import { getRelativeTime } from "../functions/TimeFormatter";
+import { getCookie } from "../functions/Cookies";
+
+// Interface for JWT payload
+interface JWTPayload {
+  user_id: number;
+  username: string;
+  exp: number;
+}
 
 interface PostCardProps {
   post: Post;
-  topicName?: string;
+  onPostChanged?: () => void;
 }
 
-export default function PostCard({ post, topicName }: PostCardProps) {
+export default function PostCard({ post, onPostChanged }: PostCardProps) {
   const navigate = useNavigate();
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const handleUpdate = (
-    id: string,
+  // Get current user ID from JWT token
+  const getCurrentUserId = (): number | null => {
+    const token = getCookie("access_token");
+    if (token) {
+      try {
+        const decoded = jwtDecode<JWTPayload>(token);
+        return decoded.user_id;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const currentUserId = getCurrentUserId();
+  const isOwner = currentUserId !== null && currentUserId === post.user_id;
+
+  const handleUpdate = async (
+    id: number,
     updatedTitle: string,
     updatedContent: string
   ) => {
-    // TODO: Call API to update post
-    console.log("Update post:", id, updatedTitle, updatedContent);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ "title": updatedTitle, "content": updatedContent, "id": id }),
+      credentials: "include",
+    });
+    // Refresh the posts list after update
+    onPostChanged?.();
   };
 
-  const handleDeleteConfirm = (id: string) => {
-    // TODO: Call API to delete post
-    console.log("Delete post:", id);
+  const handleDeleteConfirm = async (id: number) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ "id": id }),
+      credentials: "include",
+    });
+    // Refresh the posts list after delete
+    onPostChanged?.();
   };
 
   const formattedDate = getRelativeTime(post.created_at);
@@ -95,20 +136,6 @@ export default function PostCard({ post, topicName }: PostCardProps) {
                 </Box>
               </Box>
             </Box>
-
-            {topicName && (
-              <Chip
-                label={topicName}
-                size="small"
-                sx={{
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
-                  color: "text.secondary",
-                  borderRadius: "8px",
-                  height: 24,
-                  fontSize: "0.75rem",
-                }}
-              />
-            )}
           </Box>
 
           <Box sx={{ mb: 3 }}>
@@ -168,48 +195,50 @@ export default function PostCard({ post, topicName }: PostCardProps) {
               Read full post
             </Button>
 
-            <Box
-              className="action-buttons"
-              sx={{
-                opacity: { xs: 1, md: 0.7 },
-                transition: "opacity 0.2s",
-                display: "flex",
-                gap: 1,
-              }}
-            >
-              <IconButton
-                size="small"
-                onClick={() => setOpenUpdateModal(true)}
+            {isOwner && (
+              <Box
+                className="action-buttons"
                 sx={{
-                  color: "text.secondary",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 2,
-                  "&:hover": {
-                    color: "primary.main",
-                    borderColor: "primary.main",
-                    bgcolor: "rgba(56, 189, 248, 0.08)",
-                  },
+                  opacity: { xs: 1, md: 0.7 },
+                  transition: "opacity 0.2s",
+                  display: "flex",
+                  gap: 1,
                 }}
               >
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => setOpenDeleteModal(true)}
-                sx={{
-                  color: "text.secondary",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 2,
-                  "&:hover": {
-                    color: "error.main",
-                    borderColor: "error.main",
-                    bgcolor: "rgba(239, 68, 68, 0.08)",
-                  },
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
+                <IconButton
+                  size="small"
+                  onClick={() => setOpenUpdateModal(true)}
+                  sx={{
+                    color: "text.secondary",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: 2,
+                    "&:hover": {
+                      color: "primary.main",
+                      borderColor: "primary.main",
+                      bgcolor: "rgba(56, 189, 248, 0.08)",
+                    },
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => setOpenDeleteModal(true)}
+                  sx={{
+                    color: "text.secondary",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: 2,
+                    "&:hover": {
+                      color: "error.main",
+                      borderColor: "error.main",
+                      bgcolor: "rgba(239, 68, 68, 0.08)",
+                    },
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
           </Box>
         </CardContent>
       </Card>
@@ -218,17 +247,17 @@ export default function PostCard({ post, topicName }: PostCardProps) {
       <UpdatePostModal
         open={openUpdateModal}
         onClose={() => setOpenUpdateModal(false)}
-        postId={post.id.toString()}
+        postId={post.id}
         currentTitle={post.title}
         currentContent={post.content}
-        topicName={topicName}
+        topicName={post.title}
         onUpdate={handleUpdate}
       />
 
       <DeletePostModal
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
-        postId={post.id.toString()}
+        postId={post.id}
         postTitle={post.title}
         onDelete={handleDeleteConfirm}
       />

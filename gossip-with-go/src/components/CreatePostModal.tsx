@@ -42,6 +42,9 @@ export default function CreatePostModal({
       credentials: "include",
     });
 
+    setTitle("");
+    setContent("");
+
     onClose();
   }
 

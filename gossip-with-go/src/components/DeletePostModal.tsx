@@ -13,15 +13,15 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 interface DeletePostModalProps {
   open: boolean;
   onClose: () => void;
-  postId?: string;
+  postId: number;
   postTitle?: string;
-  onDelete?: (postId: string) => void;
+  onDelete?: (postId: number) => void;
 }
 
 export default function DeletePostModal({
   open,
   onClose,
-  postId = "",
+  postId,
   postTitle = "this post",
   onDelete,
 }: DeletePostModalProps) {
