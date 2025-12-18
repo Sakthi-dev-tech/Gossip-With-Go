@@ -96,8 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.status === 200) {
         await response.json();
-        // Backend sets the access_token cookie automatically
-        setIsAuthenticated(true);
+        // we do not set authenticated is true, forcing user to sign in
         return "success";
       } else {
         const errorText = await response.text();

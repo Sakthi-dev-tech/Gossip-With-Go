@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(true);
@@ -24,9 +25,13 @@ export default function LoginPage() {
   // Handle transition between Login and Register
   const handleToggle = () => {
     setVisible(false);
+
     setUsername("");
     setPassword("");
+
     setErrorMessage("");
+    setSuccessMessage("");
+
     setTimeout(() => {
       setIsLogin((prev) => !prev);
       setVisible(true);
@@ -122,6 +127,19 @@ export default function LoginPage() {
             </Alert>
           </Collapse>
 
+          {/* Success Message Display */}
+          <Collapse in={!!successMessage}>
+            <Alert
+              severity="success"
+              onClose={() => setSuccessMessage("")}
+              sx={{
+                borderRadius: 2,
+              }}
+            >
+              {successMessage}
+            </Alert>
+          </Collapse>
+
           <Button
             variant="contained"
             color="secondary"
@@ -137,6 +155,7 @@ export default function LoginPage() {
             onClick={async () => {
               // Clear previous error message when user tries again
               setErrorMessage("");
+              setSuccessMessage("");
 
               // Validate that username and password are not empty
               if (!username.trim()) {
@@ -172,6 +191,13 @@ export default function LoginPage() {
                     // Display error message on the page
                     setErrorMessage(result);
                     console.error("Register failed:", result);
+                  } else {
+                    setSuccessMessage(
+                      "Registration successful! You can now login."
+                    );
+                    // Stay on register screen, but clear credentials
+                    setUsername("");
+                    setPassword("");
                   }
                 } catch (error) {
                   const errMsg =
@@ -194,7 +220,7 @@ export default function LoginPage() {
                 : "Already have an account? "}
               <Box
                 component="span"
-                onClick={handleToggle}
+                onClick={() => handleToggle()}
                 sx={{
                   color: "secondary.main",
                   cursor: "pointer",
