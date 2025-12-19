@@ -94,7 +94,7 @@ func (app *application) mount() http.Handler {
 
 	// Allow CORS
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://sakthi-dev-tech.github.io"},
+		AllowedOrigins:   []string{"http://localhost:3000", "https://sakthi-dev-tech.github.io", "gossip-with-go-production.up.railway.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Accept", "Content-Type"},
 		AllowCredentials: true,
