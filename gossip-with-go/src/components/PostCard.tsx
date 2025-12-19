@@ -56,7 +56,7 @@ export default function PostCard({ title, content, id, username, user_id, create
   };
 
   const currentUserId = getCurrentUserId();
-  const isOwner = currentUserId !== null && currentUserId === id;
+  const isOwner = currentUserId !== null && currentUserId === user_id;
 
   const handleUpdate = async (
     id: number,
@@ -184,14 +184,16 @@ export default function PostCard({ title, content, id, username, user_id, create
           >
             <Button
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate(`/post`, { state: { 
-                post_id: id,
-                title: title,
-                content,
-                username,
-                user_id,
-                created_at
-              }})}
+              onClick={() => navigate(`/post`, {
+                state: {
+                  post_id: id,
+                  title: title,
+                  content,
+                  username,
+                  user_id,
+                  created_at
+                }
+              })}
               sx={{
                 color: "secondary.main",
                 fontWeight: 600,
