@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import CustomSnackbar from "./CustomSnackbar";
 import { capitaliseWords } from "../functions/TextFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 interface CreateTopicModalProps {
   open: boolean;
@@ -41,7 +42,7 @@ export default function CreateTopicModal({
     }
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${process.env.REACT_APP_API_URL}/addTopic`,
         {
           method: "POST",
@@ -52,7 +53,6 @@ export default function CreateTopicModal({
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
         }
       );
 

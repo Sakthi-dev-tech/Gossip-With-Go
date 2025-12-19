@@ -5,6 +5,7 @@ import { useState } from "react";
 import UpdateCommentModal from "./UpdateCommentModal";
 import DeleteCommentModal from "./DeleteCommentModal";
 import { getRelativeTime } from "../functions/TimeFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 interface CommentBoxProps {
   commentId: number;
@@ -28,7 +29,7 @@ export default function CommentBox({
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleUpdate = async (id: number, updatedContent: string) => {
-    await fetch(`${process.env.REACT_APP_API_URL}/updateComment`, {
+    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/updateComment`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -37,13 +38,12 @@ export default function CommentBox({
         "id": id,
         "content": updatedContent,
       }),
-      credentials: "include",
     });
     refreshComments();
   };
 
   const handleDeleteConfirm = async (id: number) => {
-    await fetch(`${process.env.REACT_APP_API_URL}/deleteComment`, {
+    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/deleteComment`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,6 @@ export default function CommentBox({
       body: JSON.stringify({
         "id": id,
       }),
-      credentials: "include",
     });
     refreshComments();
   };

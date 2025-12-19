@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { getCookie } from "../functions/Cookies";
 import { getRelativeTime } from "../functions/TimeFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateTopicModal from "./UpdateTopicModal";
@@ -69,7 +70,7 @@ export default function TopicsBox({
     updatedDescription: string
   ) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${process.env.REACT_APP_API_URL}/updateTopic`,
         {
           method: "PUT",
@@ -81,7 +82,6 @@ export default function TopicsBox({
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
         }
       );
 
@@ -98,7 +98,7 @@ export default function TopicsBox({
 
   const handleDeleteConfirm = async (id: number) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${process.env.REACT_APP_API_URL}/deleteTopic`,
         {
           method: "DELETE",
@@ -108,7 +108,6 @@ export default function TopicsBox({
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
         }
       );
 

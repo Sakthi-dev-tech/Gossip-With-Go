@@ -8,6 +8,7 @@ import CreatePostModal from "../components/CreatePostModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Post } from "../types/Posts";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
@@ -18,13 +19,12 @@ export default function PostsPage() {
   const { topicId, title, description } = location.state;
 
   const fetchPosts = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/fetchPosts`, {
+    const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/fetchPosts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ topic_id: topicId }),
-      credentials: "include",
     });
     const data = await response.json();
     if (data !== null) {

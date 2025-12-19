@@ -60,18 +60,25 @@ func ParseUserToken(tokenString string) (*UserClaims, error) {
 // Attach JWT authentication middleware to application
 func JWTAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Retrieve token from cookie
+		var tokenString string
+
+		// First, try to retrieve token from cookie
 		cookie, err := r.Cookie("access_token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				http.Error(w, "missing authorisation header", http.StatusUnauthorized)
-				return
+		if err == nil {
+			tokenString = cookie.Value
+		} else {
+			// Fallback: Try to retrieve token from Authorization header (for Safari support)
+			authHeader := r.Header.Get("Authorization")
+			if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+				tokenString = authHeader[7:]
 			}
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
 		}
 
-		tokenString := cookie.Value
+		// If no token found in either location
+		if tokenString == "" {
+			http.Error(w, "Unauthorised Access", http.StatusUnauthorized)
+			return
+		}
 
 		// Parse and validates the token
 		claims, err := ParseUserToken(tokenString)
@@ -96,7 +103,7 @@ func (app *application) mount() http.Handler {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "https://sakthi-dev-tech.github.io", "https://gossip-with-go-production.up.railway.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders:   []string{"Accept", "Content-Type"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))

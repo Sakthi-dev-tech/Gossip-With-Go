@@ -17,6 +17,7 @@ import { getCookie } from "../functions/Cookies";
 import { jwtDecode } from "jwt-decode";
 import CustomSnackbar from "../components/CustomSnackbar";
 import { capitaliseWords } from "../functions/TextFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 // Interface for JWT payload
 interface JWTPayload {
@@ -65,13 +66,12 @@ export default function PostDetailPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/addComment`, {
+      const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/addComment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ "content": comment, "post_id": post_id }),
-        credentials: "include",
       });
 
       if (response.ok) {
@@ -94,13 +94,12 @@ export default function PostDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/fetchComments`, {
+      const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/fetchComments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ "post_id": post_id }),
-        credentials: "include",
       });
 
       if (response.ok) {

@@ -17,6 +17,7 @@ import UpdatePostModal from "./UpdatePostModal";
 import DeletePostModal from "./DeletePostModal";
 import { getRelativeTime } from "../functions/TimeFormatter";
 import { getCookie } from "../functions/Cookies";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 // Interface for JWT payload
 interface JWTPayload {
@@ -62,26 +63,24 @@ export default function PostCard({ title, content, id, username, user_id, create
     updatedTitle: string,
     updatedContent: string
   ) => {
-    await fetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
+    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ "title": updatedTitle, "content": updatedContent, "id": id }),
-      credentials: "include",
     });
 
     onPostChanged?.();
   };
 
   const handleDeleteConfirm = async (id: number) => {
-    await fetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
+    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ "id": id }),
-      credentials: "include",
     });
 
     onPostChanged?.();

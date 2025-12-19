@@ -9,5 +9,5 @@ export const getCookie = (name: string): string | null => {
 
 // Helper function to delete a cookie by setting the expiry date to the earliest possible time
 export const deleteCookie = (name: string): void => {
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;`;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 };

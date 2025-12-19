@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import CustomSnackbar from "./CustomSnackbar";
 import { capitaliseWords } from "../functions/TextFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 interface CreatePostModalProps {
   open: boolean;
@@ -49,7 +50,7 @@ export default function CreatePostModal({
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/addPost`, {
+      const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/addPost`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +60,6 @@ export default function CreatePostModal({
           "content": content,
           "topic_id": topicId
         }),
-        credentials: "include",
       });
 
       if (response.ok) {

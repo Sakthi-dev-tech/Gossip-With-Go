@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Topic } from "../types/Topics";
 import CustomSnackbar from "../components/CustomSnackbar";
 import { capitaliseWords } from "../functions/TextFormatter";
+import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 export default function TopicsPage() {
   const [openCreateTopic, setOpenCreateTopic] = useState<boolean>(false);
@@ -16,11 +17,8 @@ export default function TopicsPage() {
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/fetchTopics`,
-        {
-          credentials: "include",
-        }
+      const response = await authenticatedFetch(
+        `${process.env.REACT_APP_API_URL}/fetchTopics`
       );
 
       if (!response.ok) {
