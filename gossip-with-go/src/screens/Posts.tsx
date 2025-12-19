@@ -1,9 +1,10 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
-import { Link as Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Post } from "../types/Posts";
 
@@ -11,7 +12,8 @@ export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [posts, setPosts] = useState<Post[]>([])
   const location = useLocation();
-  const {topicId, title, description} = location.state;
+  const navigate = useNavigate();
+  const { topicId, title, description } = location.state;
 
   const fetchPosts = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/fetchPosts`, {
@@ -25,7 +27,7 @@ export default function PostsPage() {
     const data = await response.json();
     if (data !== null) {
       setPosts(data);
-    } 
+    }
   }
 
   useEffect(() => {
@@ -44,6 +46,21 @@ export default function PostsPage() {
 
       {/* Main Content */}
       <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
+        {/* Back Button */}
+        <IconButton
+          onClick={() => navigate("/topics")}
+          sx={{
+            mb: 3,
+            color: "text.secondary",
+            "&:hover": {
+              color: "secondary.main",
+              backgroundColor: "rgba(239, 175, 103, 0.1)",
+            },
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+
         {/* Header Section */}
         <Box
           sx={{

@@ -9,13 +9,14 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
 
 interface UpdateCommentModalProps {
   open: boolean;
   onClose: () => void;
   commentId: number;
   currentContent?: string;
-  onUpdate?: (commentId: number, content: string) => void;
+  onUpdate: (commentId: number, content: string) => void;
 }
 
 export default function UpdateCommentModal({
@@ -25,13 +26,10 @@ export default function UpdateCommentModal({
   currentContent = "",
   onUpdate,
 }: UpdateCommentModalProps) {
+  const [updatedContent, setUpdatedContent] = useState(currentContent);
+
   const handleUpdate = () => {
-    if (onUpdate && commentId) {
-      const content =
-        (document.getElementById("comment-content") as HTMLInputElement)
-          ?.value || "";
-      onUpdate(commentId, content);
-    }
+    onUpdate(commentId, updatedContent);
     onClose();
   };
 
@@ -94,6 +92,8 @@ export default function UpdateCommentModal({
             defaultValue={currentContent}
             placeholder="Share your thoughts..."
             variant="outlined"
+            value={updatedContent}
+            onChange={(e) => setUpdatedContent(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,

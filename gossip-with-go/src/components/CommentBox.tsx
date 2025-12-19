@@ -12,6 +12,7 @@ interface CommentBoxProps {
   user_id: number;
   created_at: string;
   isOwner?: boolean;
+  refreshComments: () => void;
 }
 
 export default function CommentBox({
@@ -19,18 +20,38 @@ export default function CommentBox({
   username,
   content,
   isOwner = false,
+  refreshComments,
 }: CommentBoxProps) {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const handleUpdate = (id: number, updatedContent: string) => {
-    // TODO: Call API to update comment
-    console.log("Update comment:", id, updatedContent);
+  const handleUpdate = async (id: number, updatedContent: string) => {
+    await fetch(`${process.env.REACT_APP_API_URL}/updateComment`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "id": id,
+        "content": updatedContent,
+      }),
+      credentials: "include",
+    });
+    refreshComments();
   };
 
-  const handleDeleteConfirm = (id: number) => {
-    // TODO: Call API to delete comment
-    console.log("Delete comment:", id);
+  const handleDeleteConfirm = async (id: number) => {
+    await fetch(`${process.env.REACT_APP_API_URL}/deleteComment`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "id": id,
+      }),
+      credentials: "include",
+    });
+    refreshComments();
   };
 
   return (

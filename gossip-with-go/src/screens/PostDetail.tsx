@@ -3,11 +3,13 @@ import {
   Typography,
   Divider,
   Button,
-  TextField
+  TextField,
+  IconButton
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FloatingAppBar from "../components/FloatingAppBar";
 import CommentBox from "../components/CommentBox";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getRelativeTime } from "../functions/TimeFormatter";
 import { Comment } from "../types/Comments";
 import { useEffect, useState } from "react";
@@ -24,6 +26,7 @@ interface JWTPayload {
 export default function PostDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const location = useLocation();
+  const navigate = useNavigate();
   const { title, content, username, user_id, created_at, post_id } = location.state;
 
   const [comment, setComment] = useState("");
@@ -95,6 +98,20 @@ export default function PostDetailPage() {
 
       {/* Main Content Area */}
       <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
+        {/* Back Button */}
+        <IconButton
+          onClick={() => navigate(-1)}
+          sx={{
+            mb: 3,
+            color: "text.secondary",
+            "&:hover": {
+              color: "secondary.main",
+              backgroundColor: "rgba(239, 175, 103, 0.1)",
+            },
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
 
         {/* Post Container */}
         <Box
@@ -216,6 +233,7 @@ export default function PostDetailPage() {
                 user_id={comment.user_id}
                 created_at={comment.created_at}
                 isOwner={comment.user_id === currentUserId}
+                refreshComments={fetchComments}
               />
             ))
           }
