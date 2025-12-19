@@ -101,12 +101,11 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     "access_token",
 		Value:    token,
-		Domain:   "localhost", // Critical: allows cookie to work across different localhost ports
 		Path:     "/",
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
-		HttpOnly: false, // TODO: Set this to true for production for security
-		Secure:   false, // TODO: Set this to true for production for security
-		SameSite: http.SameSiteLaxMode,
+		HttpOnly: false,                 // Frontend needs to read token for user info
+		Secure:   true,                  // Required for SameSite=None (HTTPS only)
+		SameSite: http.SameSiteNoneMode, // Required for cross-origin requests
 	}
 
 	// set cookie in response header

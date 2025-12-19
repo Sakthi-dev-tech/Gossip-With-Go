@@ -10,7 +10,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: Make sure the sslmode is proper before deploying
 func main() {
 	ctx := context.Background()
 
