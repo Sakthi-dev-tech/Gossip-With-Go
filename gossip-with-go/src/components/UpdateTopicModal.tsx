@@ -9,6 +9,9 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
+import CustomSnackbar from "./CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 interface UpdateTopicModalProps {
   open: boolean;
@@ -27,7 +30,14 @@ export default function UpdateTopicModal({
   currentDescription = "",
   onUpdate,
 }: UpdateTopicModalProps) {
-  const handleUpdate = () => {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleUpdate = async () => {
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (onUpdate && topicId) {
       const title =
         (document.getElementById("topic-title") as HTMLInputElement)?.value ||
@@ -35,9 +45,31 @@ export default function UpdateTopicModal({
       const description =
         (document.getElementById("topic-description") as HTMLInputElement)
           ?.value || "";
-      onUpdate(topicId, title, description);
+
+      // Validate input
+      if (!title.trim()) {
+        setErrorMessage("Please Enter A Title");
+        return;
+      }
+
+      try {
+        await onUpdate(topicId, title, description);
+        setSuccessMessage("Topic Updated Successfully!");
+
+        // Close modal after a short delay
+        setTimeout(() => {
+          onClose();
+        }, 500);
+      } catch (error) {
+        const errMsg =
+          error instanceof Error
+            ? error.message
+            : "An Unexpected Error Occurred";
+        setErrorMessage(capitaliseWords(errMsg));
+      }
+    } else {
+      onClose();
     }
-    onClose();
   };
 
   return (
@@ -48,7 +80,7 @@ export default function UpdateTopicModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          backgroundColor: "#111827", // Dark background
+          backgroundColor: "#111827",
           backgroundImage: "none",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -56,7 +88,7 @@ export default function UpdateTopicModal({
       }}
       BackdropProps={{
         sx: {
-          backgroundColor: "rgba(0, 0, 0, 0.8)", // Darkened backdrop
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
         },
       }}
     >
@@ -198,6 +230,19 @@ export default function UpdateTopicModal({
           Update
         </Button>
       </DialogActions>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Dialog>
   );
 }

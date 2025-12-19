@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
+import CustomSnackbar from "./CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 interface UpdateCommentModalProps {
   open: boolean;
@@ -27,10 +29,35 @@ export default function UpdateCommentModal({
   onUpdate,
 }: UpdateCommentModalProps) {
   const [updatedContent, setUpdatedContent] = useState(currentContent);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleUpdate = () => {
-    onUpdate(commentId, updatedContent);
-    onClose();
+  const handleUpdate = async () => {
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // Validate input
+    if (!updatedContent.trim()) {
+      setErrorMessage("Please Enter Content");
+      return;
+    }
+
+    try {
+      await onUpdate(commentId, updatedContent);
+      setSuccessMessage("Comment Updated Successfully!");
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
+    }
   };
 
   return (
@@ -153,6 +180,19 @@ export default function UpdateCommentModal({
           Update
         </Button>
       </DialogActions>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Dialog>
   );
 }

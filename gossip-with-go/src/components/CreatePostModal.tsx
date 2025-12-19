@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
+import CustomSnackbar from "./CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 interface CreatePostModalProps {
   open: boolean;
@@ -27,25 +29,59 @@ export default function CreatePostModal({
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function createPost() {
-    await fetch(`${process.env.REACT_APP_API_URL}/addPost`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "title": title,
-        "content":content,
-        "topic_id": topicId
-      }),
-      credentials: "include",
-    });
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
 
-    setTitle("");
-    setContent("");
+    // Validate input
+    if (!title.trim()) {
+      setErrorMessage("Please Enter A Title");
+      return;
+    }
 
-    onClose();
+    if (!content.trim()) {
+      setErrorMessage("Please Enter Content");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/addPost`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "title": title,
+          "content": content,
+          "topic_id": topicId
+        }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setTitle("");
+        setContent("");
+        setSuccessMessage("Post Created Successfully!");
+
+        setTimeout(() => {
+          onClose();
+        }, 500);
+      } else {
+        const errorData = await response.text();
+        setErrorMessage(capitaliseWords(errorData || "Failed To Create Post"));
+      }
+    } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
+      console.error("Error creating post:", error);
+    }
   }
 
   return (
@@ -118,7 +154,7 @@ export default function CreatePostModal({
             sx={{
               mb: 3,
               // Target the root container of the OutlinedInput
-              "& .MuiOutlinedInput-root": { 
+              "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 color: "white", // text colour
@@ -213,6 +249,19 @@ export default function CreatePostModal({
           Post
         </Button>
       </DialogActions>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Dialog>
   );
 }

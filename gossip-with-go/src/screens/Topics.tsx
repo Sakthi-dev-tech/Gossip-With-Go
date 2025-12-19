@@ -5,11 +5,14 @@ import TopicsBox from "../components/TopicsBox";
 import CreateTopicModal from "../components/CreateTopicModal";
 import { useEffect, useState } from "react";
 import { Topic } from "../types/Topics";
+import CustomSnackbar from "../components/CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 export default function TopicsPage() {
   const [openCreateTopic, setOpenCreateTopic] = useState<boolean>(false);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchTopics = async () => {
     try {
@@ -21,7 +24,9 @@ export default function TopicsPage() {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.text();
+        setErrorMessage(capitaliseWords(errorData || "Failed To Fetch Topics"));
+        return;
       }
 
       const data = await response.json();
@@ -30,6 +35,11 @@ export default function TopicsPage() {
       }
       setAllTopics(data);
     } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
       console.error("Failed to fetch topics:", error);
     }
   };
@@ -139,6 +149,13 @@ export default function TopicsPage() {
           </Grid>
         </Box>
       </Box>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
     </Box>
   );
 }

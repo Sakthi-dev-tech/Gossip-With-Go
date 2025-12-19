@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
+import CustomSnackbar from "./CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 interface UpdatePostModalProps {
   open: boolean;
@@ -33,10 +35,40 @@ export default function UpdatePostModal({
 
   const [title, setTitle] = useState(currentTitle);
   const [content, setContent] = useState(currentContent);
-  
-  const handleUpdate = () => {
-    onUpdate(postId, title, content);
-    onClose();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleUpdate = async () => {
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // Validate input
+    if (!title.trim()) {
+      setErrorMessage("Please Enter A Title");
+      return;
+    }
+
+    if (!content.trim()) {
+      setErrorMessage("Please Enter Content");
+      return;
+    }
+
+    try {
+      await onUpdate(postId, title, content);
+      setSuccessMessage("Post Updated Successfully!");
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
+    }
   };
 
   return (
@@ -47,7 +79,7 @@ export default function UpdatePostModal({
       maxWidth="sm"
       PaperProps={{
         sx: {
-          backgroundColor: "#111827", 
+          backgroundColor: "#111827",
           backgroundImage: "none",
           borderRadius: 3,
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -208,6 +240,19 @@ export default function UpdatePostModal({
           Update
         </Button>
       </DialogActions>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Dialog>
   );
 }

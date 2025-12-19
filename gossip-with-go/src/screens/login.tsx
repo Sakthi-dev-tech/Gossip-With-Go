@@ -10,6 +10,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
+import CustomSnackbar from "../components/CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -101,45 +103,6 @@ export default function LoginPage() {
             />
           </Box>
 
-          {/* Error Message Display */}
-          <Collapse in={!!errorMessage}>
-            <Alert
-              severity="error"
-              onClose={() => setErrorMessage("")}
-              sx={{
-                borderRadius: 2,
-                animation: errorMessage ? "shake 0.3s" : "none",
-                "@keyframes shake": {
-                  "0%, 100%": { transform: "translateX(0)" },
-                  "25%": { transform: "translateX(-5px)" },
-                  "75%": { transform: "translateX(5px)" },
-                },
-              }}
-            >
-              {/* make only the starting letter of each word uppercase */}
-              {errorMessage
-                .split(" ")
-                .map(
-                  (word) =>
-                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                )
-                .join(" ")}
-            </Alert>
-          </Collapse>
-
-          {/* Success Message Display */}
-          <Collapse in={!!successMessage}>
-            <Alert
-              severity="success"
-              onClose={() => setSuccessMessage("")}
-              sx={{
-                borderRadius: 2,
-              }}
-            >
-              {successMessage}
-            </Alert>
-          </Collapse>
-
           <Button
             variant="contained"
             color="secondary"
@@ -159,12 +122,12 @@ export default function LoginPage() {
 
               // Validate that username and password are not empty
               if (!username.trim()) {
-                setErrorMessage("Please enter a username");
+                setErrorMessage("Please Enter A Username");
                 return;
               }
 
               if (!password.trim()) {
-                setErrorMessage("Please enter a password");
+                setErrorMessage("Please Enter A Password");
                 return;
               }
 
@@ -172,28 +135,26 @@ export default function LoginPage() {
                 try {
                   const result = await login(username, password);
                   if (result !== "success") {
-                    // Display error message on the page
-                    setErrorMessage(result);
+                    setErrorMessage(capitaliseWords(result));
                     console.error("Login failed:", result);
                   }
                 } catch (error) {
                   const errMsg =
                     error instanceof Error
                       ? error.message
-                      : "An unexpected error occurred";
-                  setErrorMessage(errMsg);
+                      : "An Unexpected Error Occurred";
+                  setErrorMessage(capitaliseWords(errMsg));
                   console.error("Login error:", error);
                 }
               } else {
                 try {
                   const result = await register(username, password);
                   if (result !== "success") {
-                    // Display error message on the page
-                    setErrorMessage(result);
+                    setErrorMessage(capitaliseWords(result));
                     console.error("Register failed:", result);
                   } else {
                     setSuccessMessage(
-                      "Registration successful! You can now login."
+                      "Registration Successful! You Can Now Login."
                     );
                     // Stay on register screen, but clear credentials
                     setUsername("");
@@ -204,7 +165,7 @@ export default function LoginPage() {
                     error instanceof Error
                       ? error.message
                       : "An unexpected error occurred";
-                  setErrorMessage(errMsg);
+                  setErrorMessage(capitaliseWords(errMsg));
                   console.error("Register error:", error);
                 }
               }
@@ -237,6 +198,18 @@ export default function LoginPage() {
           </Box>
         </Card>
       </Fade>
-    </div>
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
+    </div >
   );
 }

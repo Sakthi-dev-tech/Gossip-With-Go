@@ -15,6 +15,8 @@ import { Comment } from "../types/Comments";
 import { useEffect, useState } from "react";
 import { getCookie } from "../functions/Cookies";
 import { jwtDecode } from "jwt-decode";
+import CustomSnackbar from "../components/CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 // Interface for JWT payload
 interface JWTPayload {
@@ -30,6 +32,8 @@ export default function PostDetailPage() {
   const { title, content, username, user_id, created_at, post_id } = location.state;
 
   const [comment, setComment] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const formattedDate = getRelativeTime(created_at);
 
@@ -50,6 +54,16 @@ export default function PostDetailPage() {
   let currentUserId = getCurrentUserId();
 
   const postComment = async () => {
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // Validate input
+    if (!comment.trim()) {
+      setErrorMessage("Please Enter A Comment");
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/addComment`, {
         method: "POST",
@@ -60,9 +74,20 @@ export default function PostDetailPage() {
         credentials: "include",
       });
 
-      setComment("");
-      fetchComments();
+      if (response.ok) {
+        setComment("");
+        setSuccessMessage("Comment Posted Successfully!");
+        fetchComments();
+      } else {
+        const errorData = await response.text();
+        setErrorMessage(capitaliseWords(errorData || "Failed To Post Comment"));
+      }
     } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
       console.error("Error posting comment:", error);
     }
   };
@@ -77,13 +102,24 @@ export default function PostDetailPage() {
         body: JSON.stringify({ "post_id": post_id }),
         credentials: "include",
       });
-      const data = await response.json();
-      if (data !== null) {
-        setComments(data);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data !== null) {
+          setComments(data);
+        } else {
+          setComments([]);
+        }
       } else {
-        setComments([]);
+        const errorData = await response.text();
+        setErrorMessage(capitaliseWords(errorData || "Failed To Fetch Comments"));
       }
     } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
       console.error("Error fetching comments:", error);
     }
   };
@@ -241,6 +277,19 @@ export default function PostDetailPage() {
           }
         </Box>
       </Box>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Box>
   );
 }

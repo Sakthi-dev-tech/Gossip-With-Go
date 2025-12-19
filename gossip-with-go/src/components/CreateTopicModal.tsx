@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
+import CustomSnackbar from "./CustomSnackbar";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 interface CreateTopicModalProps {
   open: boolean;
@@ -24,8 +26,20 @@ export default function CreateTopicModal({
 }: CreateTopicModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function handleCreateTopic(): Promise<void> {
+    // Clear previous messages
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // Validate input
+    if (!title.trim()) {
+      setErrorMessage("Please Enter A Title");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/addTopic`,
@@ -47,17 +61,27 @@ export default function CreateTopicModal({
         setTitle("");
         setDescription("");
 
+        setSuccessMessage("Topic Created Successfully!");
+
         // Notify parent to refresh
         if (onTopicCreated) {
           onTopicCreated();
         }
 
-        // Close modal
-        onClose();
+        // Close modal after a short delay to show success message
+        setTimeout(() => {
+          onClose();
+        }, 500);
       } else {
-        console.error("Failed to create topic:", response.statusText);
+        const errorData = await response.text();
+        setErrorMessage(capitaliseWords(errorData || "Failed To Create Topic"));
       }
     } catch (error) {
+      const errMsg =
+        error instanceof Error
+          ? error.message
+          : "An Unexpected Error Occurred";
+      setErrorMessage(capitaliseWords(errMsg));
       console.error("Error creating topic:", error);
     }
   }
@@ -220,6 +244,19 @@ export default function CreateTopicModal({
           Create Topic
         </Button>
       </DialogActions>
+
+      <CustomSnackbar
+        open={!!errorMessage}
+        handleClose={() => setErrorMessage("")}
+        message={errorMessage}
+        severity="error"
+      />
+      <CustomSnackbar
+        open={!!successMessage}
+        handleClose={() => setSuccessMessage("")}
+        message={successMessage}
+        severity="success"
+      />
     </Dialog>
   );
 }
