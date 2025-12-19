@@ -16,7 +16,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/Gossip-With-Go">
           <Routes>
             <Route path="/" element={<Navigate to="/auth" replace />} />
 
