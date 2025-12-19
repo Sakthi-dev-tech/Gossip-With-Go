@@ -3,7 +3,9 @@
  */
 export function getRelativeTime(timestamp: string): string {
   const now = new Date();
-  const past = new Date(timestamp);
+  // To treat timestamps as UTC for Railway
+  const utcTimestamp = timestamp.endsWith('Z') ? timestamp : timestamp + 'Z';
+  const past = new Date(utcTimestamp);
   const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
 
   if (diffInSeconds < 0) {

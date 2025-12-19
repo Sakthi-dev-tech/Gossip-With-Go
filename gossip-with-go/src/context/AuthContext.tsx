@@ -116,7 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     console.log("Logging out...");
-    // Delete the access_token cookie and localStorage
     deleteCookie("access_token");
     localStorage.removeItem("access_token");
     setIsAuthenticated(false);
