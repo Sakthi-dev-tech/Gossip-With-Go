@@ -42,7 +42,7 @@ export default function PostCard({ title, content, id, username, user_id, create
 
   // Get current user ID from JWT token
   const getCurrentUserId = (): number | null => {
-    const token = getCookie("access_token");
+    const token = localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         const decoded = jwtDecode<JWTPayload>(token);

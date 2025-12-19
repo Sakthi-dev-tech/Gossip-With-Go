@@ -41,11 +41,9 @@ export default function TopicsBox({
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   useEffect(() => {
-    // Get JWT token from access_token cookie
-    const token = getCookie("access_token");
+    const token = localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
-        // Decode the JWT token to get the userID
         const decoded = jwtDecode<JWTPayload>(token);
         // Check if the current user is the OP of this topic
         setIsOP(decoded.user_id === user_id);

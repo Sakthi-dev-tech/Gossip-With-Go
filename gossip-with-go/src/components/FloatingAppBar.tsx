@@ -23,8 +23,8 @@ export default function FloatingAppBar({
   const [username, setUsername] = useState<string>(usernameProp || "Gossiper");
 
   useEffect(() => {
-    // Get JWT token from access_token cookie
-    const token = getCookie("access_token");
+    // Get JWT token from localStorage during production or cookie
+    const token = localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         // Decode the JWT token to get the username

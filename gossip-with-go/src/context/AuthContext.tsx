@@ -31,14 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    // Check if access_token cookie exists
-    const token = getCookie("access_token");
+    const token = localStorage.getItem("access_token") || getCookie("access_token");
 
     if (token) {
-      // Check if token is expired
       if (isTokenExpired(token)) {
-        console.log("Token is expired, deleting cookie");
+        console.log("Token is expired, clearing storage");
         deleteCookie("access_token");
+        localStorage.removeItem("access_token");
         setIsAuthenticated(false);
       } else {
         // Token exists and is valid, mark user as authenticated
@@ -63,7 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.status === 200) {
-        await response.json();
+        const data = await response.json();
+        // Save token to localStorage for user info access using JS
+        if (data.token) {
+          localStorage.setItem("access_token", data.token);
+        }
         setIsAuthenticated(true);
         return "success";
       } else {
@@ -113,8 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     console.log("Logging out...");
-    // Delete the access_token cookie
+    // Delete the access_token cookie and localStorage
     deleteCookie("access_token");
+    localStorage.removeItem("access_token");
     setIsAuthenticated(false);
   };
 
