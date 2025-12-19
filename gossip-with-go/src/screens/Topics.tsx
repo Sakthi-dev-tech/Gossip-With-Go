@@ -113,6 +113,7 @@ export default function TopicsPage() {
         <Box sx={{ flexGrow: 1, px: 4 }}>
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
             {allTopics
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
               .filter((topic) => {
                 if (!searchQuery) return true;
                 const query = searchQuery.toLowerCase();

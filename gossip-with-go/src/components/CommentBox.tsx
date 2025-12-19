@@ -4,6 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import UpdateCommentModal from "./UpdateCommentModal";
 import DeleteCommentModal from "./DeleteCommentModal";
+import { getRelativeTime } from "../functions/TimeFormatter";
 
 interface CommentBoxProps {
   commentId: number;
@@ -19,6 +20,7 @@ export default function CommentBox({
   commentId,
   username,
   content,
+  created_at,
   isOwner = false,
   refreshComments,
 }: CommentBoxProps) {
@@ -112,12 +114,20 @@ export default function CommentBox({
         )}
 
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 700, fontSize: "0.95rem" }}
-          >
-            {username}
-          </Typography>
+          <Box>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, fontSize: "0.95rem" }}
+            >
+              {username}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: "text.secondary", fontSize: "0.8rem" }}
+            >
+              Posted {getRelativeTime(created_at)}
+            </Typography>
+          </Box>
         </Box>
         <Typography
           variant="body1"

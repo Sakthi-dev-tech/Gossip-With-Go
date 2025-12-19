@@ -143,6 +143,7 @@ export default function PostsPage() {
         {/* Posts List */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {posts
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             .filter((post) => {
               if (!searchQuery) return true;
               const query = searchQuery.toLowerCase();

@@ -224,18 +224,20 @@ export default function PostDetailPage() {
           {/* Comment List */}
 
           {
-            comments.map((comment) => (
-              <CommentBox
-                key={comment.id}
-                commentId={comment.id}
-                username={comment.username}
-                content={comment.content}
-                user_id={comment.user_id}
-                created_at={comment.created_at}
-                isOwner={comment.user_id === currentUserId}
-                refreshComments={fetchComments}
-              />
-            ))
+            comments
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .map((comment) => (
+                <CommentBox
+                  key={comment.id}
+                  commentId={comment.id}
+                  username={comment.username}
+                  content={comment.content}
+                  user_id={comment.user_id}
+                  created_at={comment.created_at}
+                  isOwner={comment.user_id === currentUserId}
+                  refreshComments={fetchComments}
+                />
+              ))
           }
         </Box>
       </Box>
