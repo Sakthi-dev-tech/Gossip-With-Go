@@ -86,7 +86,6 @@ export default function TopicsBox({
       );
 
       if (response.ok) {
-        console.log("Update topic:", id, updatedTitle, updatedDescription);
         // Notify parent to refresh topics list
         if (onTopicChanged) {
           onTopicChanged();
@@ -114,7 +113,6 @@ export default function TopicsBox({
       );
 
       if (response.ok) {
-        console.log("Delete topic:", id);
         // Notify parent to refresh topics list
         if (onTopicChanged) {
           onTopicChanged();

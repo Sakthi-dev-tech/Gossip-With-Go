@@ -22,10 +22,6 @@ func (s *svc) CreateTopic(ctx context.Context, params repo.CreateTopicParams) (r
 		return repo.Topic{}, fmt.Errorf("name is required")
 	}
 
-	if params.Description == "" {
-		return repo.Topic{}, fmt.Errorf("description is required")
-	}
-
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
 		return repo.Topic{}, err
@@ -49,10 +45,6 @@ func (s *svc) UpdateTopic(ctx context.Context, params repo.UpdateTopicParams) (r
 	// validate the params
 	if params.Name == "" {
 		return repo.Topic{}, fmt.Errorf("name is required")
-	}
-
-	if params.Description == "" {
-		return repo.Topic{}, fmt.Errorf("description is required")
 	}
 
 	tx, err := s.db.Begin(ctx)

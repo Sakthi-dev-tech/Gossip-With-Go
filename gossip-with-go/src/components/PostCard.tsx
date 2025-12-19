@@ -100,17 +100,58 @@ export default function PostCard({ title, content, id, username, user_id, create
           mb: 3,
           overflow: "visible",
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
           "&:hover": {
             transform: "translateY(-4px)",
             boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
             border: "1px solid rgba(255, 255, 255, 0.2)",
-            "& .action-buttons": {
-              opacity: 1,
-            },
           },
         }}
         elevation={0}
       >
+        {/* Edit and Delete Icons - Only visible if user is owner */}
+        {isOwner && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              display: "flex",
+              gap: 1,
+            }}
+          >
+            <IconButton
+              size="small"
+              onClick={() => setOpenUpdateModal(true)}
+              sx={{
+                backgroundColor: "rgba(74, 144, 226, 0.2)",
+                color: "primary.main",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "rgba(74, 144, 226, 0.4)",
+                  transform: "scale(1.1)",
+                },
+              }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => setOpenDeleteModal(true)}
+              sx={{
+                backgroundColor: "rgba(239, 68, 68, 0.2)",
+                color: "error.main",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "rgba(239, 68, 68, 0.4)",
+                  transform: "scale(1.1)",
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        )}
         <CardContent sx={{ p: 3.5, "&:last-child": { pb: 3.5 } }}>
           {/* Header: Author & Meta */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2.5 }}>
@@ -175,7 +216,6 @@ export default function PostCard({ title, content, id, username, user_id, create
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
               pt: 2,
               borderTop: "1px solid rgba(255, 255, 255, 0.08)",
@@ -207,51 +247,6 @@ export default function PostCard({ title, content, id, username, user_id, create
             >
               Read full post
             </Button>
-
-            {isOwner && (
-              <Box
-                className="action-buttons"
-                sx={{
-                  opacity: { xs: 1, md: 0.7 },
-                  transition: "opacity 0.2s",
-                  display: "flex",
-                  gap: 1,
-                }}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => setOpenUpdateModal(true)}
-                  sx={{
-                    color: "text.secondary",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: 2,
-                    "&:hover": {
-                      color: "primary.main",
-                      borderColor: "primary.main",
-                      bgcolor: "rgba(56, 189, 248, 0.08)",
-                    },
-                  }}
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => setOpenDeleteModal(true)}
-                  sx={{
-                    color: "text.secondary",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: 2,
-                    "&:hover": {
-                      color: "error.main",
-                      borderColor: "error.main",
-                      bgcolor: "rgba(239, 68, 68, 0.08)",
-                    },
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            )}
           </Box>
         </CardContent>
       </Card>
