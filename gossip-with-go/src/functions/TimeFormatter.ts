@@ -1,7 +1,5 @@
 /**
- * Converts an ISO timestamp to a human-readable relative time string
- * @param timestamp - ISO format timestamp (e.g., "2025-12-16T15:57:28.57636")
- * @returns Human-readable time string (e.g., "2 hours ago", "3 days ago")
+ Converts an ISO timestamp to a human-readable relative time string
  */
 export function getRelativeTime(timestamp: string): string {
   const now = new Date();

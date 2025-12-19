@@ -44,9 +44,3 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-## AI Usage
-
-- Used Gemini 3 Pro for frontend design and helping out with implementation as I am comfortable with it
-- Used Claude Sonnet 4.5 for helping out with repetitive work that takes time
-- Used Gemini 3 Pro to help me understand how to go about structuring the Go backend
