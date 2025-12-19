@@ -3,50 +3,98 @@ import {
   Typography,
   Divider,
   Button,
-  TextField,
-  Breadcrumbs,
-  Link,
+  TextField
 } from "@mui/material";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Link as RouterLink } from "react-router-dom";
 import FloatingAppBar from "../components/FloatingAppBar";
 import CommentBox from "../components/CommentBox";
+import { useLocation } from "react-router-dom";
+import { getRelativeTime } from "../functions/TimeFormatter";
+import { Comment } from "../types/Comments";
+import { useEffect, useState } from "react";
+import { getCookie } from "../functions/Cookies";
+import { jwtDecode } from "jwt-decode";
+
+// Interface for JWT payload
+interface JWTPayload {
+  user_id: number;
+  username: string;
+  exp: number;
+}
 
 export default function PostDetailPage() {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const location = useLocation();
+  const { title, content, username, user_id, created_at, post_id } = location.state;
+
+  const [comment, setComment] = useState("");
+
+  const formattedDate = getRelativeTime(created_at);
+
+  // Get current user ID from JWT token
+  const getCurrentUserId = (): number | null => {
+    const token = getCookie("access_token");
+    if (token) {
+      try {
+        const decoded = jwtDecode<JWTPayload>(token);
+        return decoded.user_id;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  let currentUserId = getCurrentUserId();
+
+  const postComment = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/addComment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ "content": comment, "post_id": post_id }),
+        credentials: "include",
+      });
+
+      setComment("");
+      fetchComments();
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/fetchComments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ "post_id": post_id }),
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (data !== null) {
+        setComments(data);
+      } else {
+        setComments([]);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [post_id]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <FloatingAppBar />
 
       {/* Main Content Area */}
       <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
-        <Breadcrumbs
-          separator={
-            <NavigateNextIcon
-              fontSize="small"
-              sx={{ color: "text.secondary" }}
-            />
-          }
-          aria-label="breadcrumb"
-          sx={{ mb: 3 }}
-        >
-          <Link
-            component={RouterLink}
-            to="/topics"
-            underline="hover"
-            color="text.secondary"
-          >
-            Topics
-          </Link>
-          <Link
-            component={RouterLink}
-            to="/posts"
-            underline="hover"
-            color="text.secondary"
-          >
-            Go Language
-          </Link>
-          <Typography color="text.primary">Post Detail</Typography>
-        </Breadcrumbs>
 
         {/* Post Container */}
         <Box
@@ -69,12 +117,14 @@ export default function PostDetailPage() {
               fontSize: { xs: "2rem", md: "2.5rem" },
             }}
           >
-            Exploring the new features in Go 1.21
+            {title}
           </Typography>
 
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            Posted by <span style={{ color: "#fff" }}>{username}</span>
+          </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
-            Posted by <span style={{ color: "#fff" }}>gopher_dev</span> on 2
-            hours ago
+            {formattedDate}
           </Typography>
 
           <Divider sx={{ mb: 3, borderColor: "rgba(255,255,255,0.1)" }} />
@@ -83,37 +133,7 @@ export default function PostDetailPage() {
             variant="body1"
             sx={{ color: "text.secondary", lineHeight: 1.7, mb: 2 }}
           >
-            The Go team has just released Go 1.21, and it's packed with a ton of
-            exciting new features and improvements. This version continues Go's
-            tradition of focusing on simplicity, reliability, and efficiency,
-            while also introducing some long-awaited enhancements that will make
-            developers' lives even easier.
-          </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{ color: "text.secondary", lineHeight: 1.7, mb: 2 }}
-          >
-            One of the most significant additions is the new 'slices' package,
-            which provides a collection of utility functions for working with
-            slices. This includes functions for sorting, searching, and
-            manipulating slice data, reducing the need for boilerplate code that
-            many of us have written time and time again. We'll dive into some
-            examples of how to use this new package to write cleaner, more
-            concise code.
-          </Typography>
-
-          <Typography
-            variant="body1"
-            sx={{ color: "text.secondary", lineHeight: 1.7 }}
-          >
-            Another major highlight is the improved performance of the garbage
-            collector, which now boasts lower latency and better overall
-            efficiency. This is great news for applications that require
-            low-latency responses, such as web servers and real-time systems.
-            The compiler has also seen some optimizations, resulting in faster
-            build times and smaller binary sizes. We'll look at some benchmarks
-            to see these improvements in action.
+            {content}
           </Typography>
         </Box>
 
@@ -143,6 +163,8 @@ export default function PostDetailPage() {
               rows={3}
               placeholder="What are your thoughts?"
               variant="outlined"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
               sx={{
                 mb: 2,
                 "& .MuiOutlinedInput-root": {
@@ -175,6 +197,7 @@ export default function PostDetailPage() {
                     backgroundColor: "#ffaa00ff",
                   },
                 }}
+                onClick={postComment}
               >
                 Post Comment
               </Button>
@@ -183,21 +206,19 @@ export default function PostDetailPage() {
 
           {/* Comment List */}
 
-          {/* Comment 1 */}
-          <CommentBox
-            commentId="1"
-            author="JaneSmith"
-            content="Great overview! I'm really excited about the new 'slices' package. It's going to clean up so much of my code."
-            isOwner={true}
-          />
-
-          {/* Comment 2 */}
-          <CommentBox
-            commentId="2"
-            author="CodeWizard"
-            content="I've been testing the new PGO (Profile Guided Optimization) features and the results are promising. Definitely worth looking into for production workloads."
-            isOwner={false}
-          />
+          {
+            comments.map((comment) => (
+              <CommentBox
+                key={comment.id}
+                commentId={comment.id}
+                username={comment.username}
+                content={comment.content}
+                user_id={comment.user_id}
+                created_at={comment.created_at}
+                isOwner={comment.user_id === currentUserId}
+              />
+            ))
+          }
         </Box>
       </Box>
     </Box>

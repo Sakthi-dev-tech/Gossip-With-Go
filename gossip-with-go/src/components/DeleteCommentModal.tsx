@@ -13,14 +13,14 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 interface DeleteCommentModalProps {
   open: boolean;
   onClose: () => void;
-  commentId?: string;
-  onDelete?: (commentId: string) => void;
+  commentId: number;
+  onDelete?: (commentId: number) => void;
 }
 
 export default function DeleteCommentModal({
   open,
   onClose,
-  commentId = "",
+  commentId,
   onDelete,
 }: DeleteCommentModalProps) {
   const handleDelete = () => {

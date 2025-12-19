@@ -145,7 +145,7 @@ func (app *application) mount() http.Handler {
 
 		commentService := comments.NewService(repo.New(app.db), app.db)
 		commentsHandler := comments.NewHandler(commentService)
-		r.Get("/fetchComments", commentsHandler.ListComments)
+		r.Post("/fetchComments", commentsHandler.ListComments)
 		r.Post("/addComment", commentsHandler.CreateComment)
 		r.Put("/updateComment", commentsHandler.UpdateComment)
 		r.Delete("/deleteComment", commentsHandler.DeleteComment)

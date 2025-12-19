@@ -13,15 +13,15 @@ import CloseIcon from "@mui/icons-material/Close";
 interface UpdateCommentModalProps {
   open: boolean;
   onClose: () => void;
-  commentId?: string;
+  commentId: number;
   currentContent?: string;
-  onUpdate?: (commentId: string, content: string) => void;
+  onUpdate?: (commentId: number, content: string) => void;
 }
 
 export default function UpdateCommentModal({
   open,
   onClose,
-  commentId = "",
+  commentId,
   currentContent = "",
   onUpdate,
 }: UpdateCommentModalProps) {

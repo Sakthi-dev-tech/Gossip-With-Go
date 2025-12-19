@@ -27,11 +27,16 @@ interface JWTPayload {
 }
 
 interface PostCardProps {
-  post: Post;
+  title: string;
+  content: string;
+  id: number;
+  username: string;
+  user_id: number;
+  created_at: string;
   onPostChanged?: () => void;
 }
 
-export default function PostCard({ post, onPostChanged }: PostCardProps) {
+export default function PostCard({ title, content, id, username, user_id, created_at, onPostChanged }: PostCardProps) {
   const navigate = useNavigate();
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -51,7 +56,7 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
   };
 
   const currentUserId = getCurrentUserId();
-  const isOwner = currentUserId !== null && currentUserId === post.user_id;
+  const isOwner = currentUserId !== null && currentUserId === id;
 
   const handleUpdate = async (
     id: number,
@@ -83,7 +88,7 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
     onPostChanged?.();
   };
 
-  const formattedDate = getRelativeTime(post.created_at);
+  const formattedDate = getRelativeTime(created_at);
 
   return (
     <>
@@ -121,7 +126,7 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
                     lineHeight: 1.2,
                   }}
                 >
-                  {post.username}
+                  {username}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   <AccessTimeIcon
@@ -150,7 +155,7 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
                 letterSpacing: "-0.01em",
               }}
             >
-              {post.title}
+              {title}
             </Typography>
             <Typography
               variant="body1"
@@ -164,7 +169,7 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
                 textOverflow: "ellipsis",
               }}
             >
-              {post.content}
+              {content}
             </Typography>
           </Box>
 
@@ -179,7 +184,14 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
           >
             <Button
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate(`/post`, { state: { post_id: post.id } })}
+              onClick={() => navigate(`/post`, { state: { 
+                post_id: id,
+                title: title,
+                content,
+                username,
+                user_id,
+                created_at
+              }})}
               sx={{
                 color: "secondary.main",
                 fontWeight: 600,
@@ -247,18 +259,18 @@ export default function PostCard({ post, onPostChanged }: PostCardProps) {
       <UpdatePostModal
         open={openUpdateModal}
         onClose={() => setOpenUpdateModal(false)}
-        postId={post.id}
-        currentTitle={post.title}
-        currentContent={post.content}
-        topicName={post.title}
+        postId={id}
+        currentTitle={title}
+        currentContent={content}
+        topicName={title}
         onUpdate={handleUpdate}
       />
 
       <DeletePostModal
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
-        postId={post.id}
-        postTitle={post.title}
+        postId={id}
+        postTitle={title}
         onDelete={handleDeleteConfirm}
       />
     </>

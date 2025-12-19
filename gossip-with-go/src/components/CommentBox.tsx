@@ -6,27 +6,29 @@ import UpdateCommentModal from "./UpdateCommentModal";
 import DeleteCommentModal from "./DeleteCommentModal";
 
 interface CommentBoxProps {
-  commentId?: string;
-  author: string;
+  commentId: number;
+  username: string;
   content: string;
+  user_id: number;
+  created_at: string;
   isOwner?: boolean;
 }
 
 export default function CommentBox({
-  commentId = "",
-  author,
+  commentId,
+  username,
   content,
   isOwner = false,
 }: CommentBoxProps) {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const handleUpdate = (id: string, updatedContent: string) => {
+  const handleUpdate = (id: number, updatedContent: string) => {
     // TODO: Call API to update comment
     console.log("Update comment:", id, updatedContent);
   };
 
-  const handleDeleteConfirm = (id: string) => {
+  const handleDeleteConfirm = (id: number) => {
     // TODO: Call API to delete comment
     console.log("Delete comment:", id);
   };
@@ -93,7 +95,7 @@ export default function CommentBox({
             variant="subtitle2"
             sx={{ fontWeight: 700, fontSize: "0.95rem" }}
           >
-            {author}
+            {username}
           </Typography>
         </Box>
         <Typography

@@ -1,10 +1,9 @@
-import { Box, Typography, Button, Breadcrumbs, Link } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Post } from "../types/Posts";
 
@@ -45,28 +44,6 @@ export default function PostsPage() {
 
       {/* Main Content */}
       <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
-        {/* Breadcrumbs for quick backwards navigation */}
-        <Breadcrumbs
-          separator={
-            <NavigateNextIcon
-              fontSize="small"
-              sx={{ color: "text.secondary" }}
-            />
-          }
-          aria-label="breadcrumb"
-          sx={{ mb: 3 }}
-        >
-          <Link
-            component={RouterLink}
-            to="/topics"
-            underline="hover"
-            color="text.secondary"
-          >
-            Topics
-          </Link>
-          <Typography color="text.primary">{title}</Typography>
-        </Breadcrumbs>
-
         {/* Header Section */}
         <Box
           sx={{
@@ -119,7 +96,12 @@ export default function PostsPage() {
           {posts.map((post) => (
             <PostCard
               key={post.id}
-              post={post}
+              title={post.title}
+              content={post.content}
+              id={post.id}
+              username={post.username}
+              user_id={post.user_id}
+              created_at={post.created_at}
               onPostChanged={fetchPosts}
             />
           ))}
