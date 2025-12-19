@@ -15,7 +15,6 @@ import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import UpdatePostModal from "./UpdatePostModal";
 import DeletePostModal from "./DeletePostModal";
-import { Post } from "../types/Posts";
 import { getRelativeTime } from "../functions/TimeFormatter";
 import { getCookie } from "../functions/Cookies";
 
@@ -63,7 +62,7 @@ export default function PostCard({ title, content, id, username, user_id, create
     updatedTitle: string,
     updatedContent: string
   ) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -71,12 +70,12 @@ export default function PostCard({ title, content, id, username, user_id, create
       body: JSON.stringify({ "title": updatedTitle, "content": updatedContent, "id": id }),
       credentials: "include",
     });
-    // Refresh the posts list after update
+
     onPostChanged?.();
   };
 
   const handleDeleteConfirm = async (id: number) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +83,7 @@ export default function PostCard({ title, content, id, username, user_id, create
       body: JSON.stringify({ "id": id }),
       credentials: "include",
     });
-    // Refresh the posts list after delete
+
     onPostChanged?.();
   };
 

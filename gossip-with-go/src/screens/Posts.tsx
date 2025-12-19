@@ -1,6 +1,7 @@
-import { Box, Typography, Button, IconButton } from "@mui/material";
+import { Box, Typography, Button, IconButton, TextField, InputAdornment } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SearchIcon from "@mui/icons-material/Search";
 import FloatingAppBar from "../components/FloatingAppBar";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
@@ -11,6 +12,7 @@ import { Post } from "../types/Posts";
 export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [posts, setPosts] = useState<Post[]>([])
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { topicId, title, description } = location.state;
@@ -108,20 +110,60 @@ export default function PostsPage() {
           </Button>
         </Box>
 
+        {/* Search Bar */}
+        <Box sx={{ mb: 4 }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search posts by title or content or author name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: 2,
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "secondary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "secondary.main",
+                },
+              },
+            }}
+          />
+        </Box>
+
         {/* Posts List */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              title={post.title}
-              content={post.content}
-              id={post.id}
-              username={post.username}
-              user_id={post.user_id}
-              created_at={post.created_at}
-              onPostChanged={fetchPosts}
-            />
-          ))}
+          {posts
+            .filter((post) => {
+              if (!searchQuery) return true;
+              const query = searchQuery.toLowerCase();
+              return (
+                post.title.toLowerCase().includes(query) ||
+                post.content.toLowerCase().includes(query) ||
+                post.username.toLowerCase().includes(query)
+              );
+            })
+            .map((post) => (
+              <PostCard
+                key={post.id}
+                title={post.title}
+                content={post.content}
+                id={post.id}
+                username={post.username}
+                user_id={post.user_id}
+                created_at={post.created_at}
+                onPostChanged={fetchPosts}
+              />
+            ))}
         </Box>
       </Box>
     </Box>

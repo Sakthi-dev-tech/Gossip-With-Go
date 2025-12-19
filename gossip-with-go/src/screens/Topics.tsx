@@ -1,4 +1,5 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography, TextField, InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import FloatingAppBar from "../components/FloatingAppBar";
 import TopicsBox from "../components/TopicsBox";
 import CreateTopicModal from "../components/CreateTopicModal";
@@ -8,6 +9,7 @@ import { Topic } from "../types/Topics";
 export default function TopicsPage() {
   const [openCreateTopic, setOpenCreateTopic] = useState<boolean>(false);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchTopics = async () => {
     try {
@@ -78,21 +80,61 @@ export default function TopicsPage() {
           </Button>
         </Box>
 
+        {/* Search Bar */}
+        <Box sx={{ px: 6, mb: 4 }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search topics by name, description, or author..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: 2,
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "secondary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "secondary.main",
+                },
+              },
+            }}
+          />
+        </Box>
+
         <Box sx={{ flexGrow: 1, px: 4 }}>
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-            {allTopics.map((topic) => (
-              <Grid size={6} key={topic.id}>
-                <TopicsBox
-                  topicId={topic.id}
-                  title={topic.name}
-                  description={topic.description}
-                  user_id={topic.user_id}
-                  username={topic.username}
-                  createdAt={topic.created_at}
-                  onTopicChanged={fetchTopics}
-                />
-              </Grid>
-            ))}
+            {allTopics
+              .filter((topic) => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                return (
+                  topic.name.toLowerCase().includes(query) ||
+                  topic.description.toLowerCase().includes(query) ||
+                  topic.username.toLowerCase().includes(query)
+                );
+              })
+              .map((topic) => (
+                <Grid size={6} key={topic.id}>
+                  <TopicsBox
+                    topicId={topic.id}
+                    title={topic.name}
+                    description={topic.description}
+                    user_id={topic.user_id}
+                    username={topic.username}
+                    createdAt={topic.created_at}
+                    onTopicChanged={fetchTopics}
+                  />
+                </Grid>
+              ))}
           </Grid>
         </Box>
       </Box>
