@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "./theme";
@@ -16,7 +16,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <BrowserRouter basename="/Gossip-With-Go">
+        <HashRouter>
           <Routes>
             <Route path="/" element={<Navigate to="/auth" replace />} />
 
@@ -31,7 +31,7 @@ function App() {
               <Route path="/post" element={<PostDetailPage />} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </ThemeProvider>
   );
