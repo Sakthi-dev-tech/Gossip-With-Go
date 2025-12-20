@@ -15,9 +15,11 @@ import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import UpdatePostModal from "./UpdatePostModal";
 import DeletePostModal from "./DeletePostModal";
+import CustomSnackbar from "./CustomSnackbar";
 import { getRelativeTime } from "../functions/TimeFormatter";
 import { getCookie } from "../functions/Cookies";
 import { authenticatedFetch } from "../functions/AuthenticatedFetch";
+import { capitaliseWords } from "../functions/TextFormatter";
 
 // Interface for JWT payload
 interface JWTPayload {
@@ -36,14 +38,27 @@ interface PostCardProps {
   onPostChanged?: () => void;
 }
 
-export default function PostCard({ title, content, id, username, user_id, created_at, onPostChanged }: PostCardProps) {
+export default function PostCard({
+  title,
+  content,
+  id,
+  username,
+  user_id,
+  created_at,
+  onPostChanged,
+}: PostCardProps) {
   const navigate = useNavigate();
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   // Get current user ID from JWT token
   const getCurrentUserId = (): number | null => {
-    const token = localStorage.getItem("access_token") || getCookie("access_token");
+    const token =
+      localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         const decoded = jwtDecode<JWTPayload>(token);
@@ -63,27 +78,71 @@ export default function PostCard({ title, content, id, username, user_id, create
     updatedTitle: string,
     updatedContent: string
   ) => {
-    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/updatePost`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ "title": updatedTitle, "content": updatedContent, "id": id }),
-    });
+    try {
+      const response = await authenticatedFetch(
+        `${process.env.REACT_APP_API_URL}/updatePost`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: updatedTitle,
+            content: updatedContent,
+            id: id,
+          }),
+        }
+      );
 
-    onPostChanged?.();
+      if (response.ok) {
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Post Updated Successfully!");
+        onPostChanged?.();
+      } else {
+        const errorData = await response.text();
+        setSnackbarSeverity("error");
+        setSnackbarMessage(
+          capitaliseWords(errorData || "Failed To Update Post")
+        );
+      }
+    } catch (error) {
+      const errMsg =
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
+      setSnackbarSeverity("error");
+      setSnackbarMessage(capitaliseWords(errMsg));
+    }
   };
 
   const handleDeleteConfirm = async (id: number) => {
-    await authenticatedFetch(`${process.env.REACT_APP_API_URL}/deletePost`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ "id": id }),
-    });
+    try {
+      const response = await authenticatedFetch(
+        `${process.env.REACT_APP_API_URL}/deletePost`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: id }),
+        }
+      );
 
-    onPostChanged?.();
+      if (response.ok) {
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Post Deleted Successfully!");
+        onPostChanged?.();
+      } else {
+        const errorData = await response.text();
+        setSnackbarSeverity("error");
+        setSnackbarMessage(
+          capitaliseWords(errorData || "Failed To Delete Post")
+        );
+      }
+    } catch (error) {
+      const errMsg =
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
+      setSnackbarSeverity("error");
+      setSnackbarMessage(capitaliseWords(errMsg));
+    }
   };
 
   const formattedDate = getRelativeTime(created_at);
@@ -153,9 +212,10 @@ export default function PostCard({ title, content, id, username, user_id, create
         )}
         <CardContent sx={{ p: 3.5, "&:last-child": { pb: 3.5 } }}>
           {/* Header: Author & Meta */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2.5 }}>
+          <Box
+            sx={{ display: "flex", justifyContent: "space-between", mb: 2.5 }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
-
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -222,16 +282,18 @@ export default function PostCard({ title, content, id, username, user_id, create
           >
             <Button
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate(`/post`, {
-                state: {
-                  post_id: id,
-                  title: title,
-                  content,
-                  username,
-                  user_id,
-                  created_at
-                }
-              })}
+              onClick={() =>
+                navigate(`/post`, {
+                  state: {
+                    post_id: id,
+                    title: title,
+                    content,
+                    username,
+                    user_id,
+                    created_at,
+                  },
+                })
+              }
               sx={{
                 color: "secondary.main",
                 fontWeight: 600,
@@ -267,6 +329,13 @@ export default function PostCard({ title, content, id, username, user_id, create
         postId={id}
         postTitle={title}
         onDelete={handleDeleteConfirm}
+      />
+
+      <CustomSnackbar
+        open={!!snackbarMessage}
+        handleClose={() => setSnackbarMessage("")}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
       />
     </>
   );

@@ -5,10 +5,12 @@ import { jwtDecode } from "jwt-decode";
 import { getCookie } from "../functions/Cookies";
 import { getRelativeTime } from "../functions/TimeFormatter";
 import { authenticatedFetch } from "../functions/AuthenticatedFetch";
+import { capitaliseWords } from "../functions/TextFormatter";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateTopicModal from "./UpdateTopicModal";
 import DeleteTopicModal from "./DeleteTopicModal";
+import CustomSnackbar from "./CustomSnackbar";
 
 interface TopicsBoxProps {
   title?: string;
@@ -40,9 +42,14 @@ export default function TopicsBox({
   const [isOP, setIsOP] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token") || getCookie("access_token");
+    const token =
+      localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         const decoded = jwtDecode<JWTPayload>(token);
@@ -86,13 +93,23 @@ export default function TopicsBox({
       );
 
       if (response.ok) {
-        // Notify parent to refresh topics list
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Topic Updated Successfully!");
         if (onTopicChanged) {
           onTopicChanged();
         }
+      } else {
+        const errorData = await response.text();
+        setSnackbarSeverity("error");
+        setSnackbarMessage(
+          capitaliseWords(errorData || "Failed To Update Topic")
+        );
       }
     } catch (error) {
-      console.error("Error updating topic:", error);
+      const errMsg =
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
+      setSnackbarSeverity("error");
+      setSnackbarMessage(capitaliseWords(errMsg));
     }
   };
 
@@ -112,13 +129,23 @@ export default function TopicsBox({
       );
 
       if (response.ok) {
-        // Notify parent to refresh topics list
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Topic Deleted Successfully!");
         if (onTopicChanged) {
           onTopicChanged();
         }
+      } else {
+        const errorData = await response.text();
+        setSnackbarSeverity("error");
+        setSnackbarMessage(
+          capitaliseWords(errorData || "Failed To Delete Topic")
+        );
       }
     } catch (error) {
-      console.error("Error deleting topic:", error);
+      const errMsg =
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
+      setSnackbarSeverity("error");
+      setSnackbarMessage(capitaliseWords(errMsg));
     }
   };
 
@@ -144,12 +171,11 @@ export default function TopicsBox({
           },
         }}
         elevation={0}
-        onClick={() => navigate(
-          "/posts",
-          {
-            state: { topicId, title, description, username }
-          }
-        )}
+        onClick={() =>
+          navigate("/posts", {
+            state: { topicId, title, description, username },
+          })
+        }
       >
         {/* Edit and Delete Icons - Only visible if user is owner */}
         {isOP && (
@@ -260,6 +286,13 @@ export default function TopicsBox({
         topicId={topicId}
         topicName={title}
         onDelete={handleDeleteConfirm}
+      />
+
+      <CustomSnackbar
+        open={!!snackbarMessage}
+        handleClose={() => setSnackbarMessage("")}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
       />
     </>
   );
