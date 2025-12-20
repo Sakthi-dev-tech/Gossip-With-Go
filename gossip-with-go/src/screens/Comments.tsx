@@ -146,7 +146,7 @@ export default function CommentsPage() {
       <FloatingAppBar />
 
       {/* Main Content Area */}
-      <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
+      <Box sx={{ flex: 1, mt: 14, px: { xs: "10%", md: "15%" }, pb: 8 }}>
         {/* Back Button */}
         <IconButton
           onClick={() => navigate(-1)}

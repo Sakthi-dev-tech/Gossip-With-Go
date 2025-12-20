@@ -58,7 +58,7 @@ export default function PostsPage() {
       />
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, mt: 14, px: "10%", pb: 8 }}>
+      <Box sx={{ flex: 1, mt: 14, px: { xs: "10%", md: "15%" }, pb: 8 }}>
         {/* Back Button */}
         <IconButton
           onClick={() => navigate("/topics")}
@@ -81,7 +81,6 @@ export default function PostsPage() {
             flexDirection: "row",
             alignItems: "flex-start",
             justifyContent: "space-between",
-            px: { xs: 2, sm: 3, md: 6 },
             mb: { xs: 2, md: 4 },
           }}
         >
@@ -125,7 +124,7 @@ export default function PostsPage() {
         </Box>
 
         {/* Search Bar */}
-        <Box sx={{ px: 2, mb: 4 }}>
+        <Box sx={{ mb: 4 }}>
           <TextField
             fullWidth
             variant="outlined"
@@ -154,7 +153,7 @@ export default function PostsPage() {
           />
         </Box>
 
-        <Box sx={{ flexGrow: 1, px: 2 }}>
+        <Box sx={{ flexGrow: 1 }}>
           {/* Posts List */}
           {/* dynamically returns the required number of columns depending on
           number of posts and screen width */}
