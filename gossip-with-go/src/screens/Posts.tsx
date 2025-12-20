@@ -1,4 +1,12 @@
-import { Box, Typography, Button, IconButton, TextField, InputAdornment } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  TextField,
+  InputAdornment,
+  Grid,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SearchIcon from "@mui/icons-material/Search";
@@ -12,29 +20,32 @@ import { authenticatedFetch } from "../functions/AuthenticatedFetch";
 
 export default function PostsPage() {
   const [openCreatePost, setOpenCreatePost] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<Post[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { topicId, title, description } = location.state;
 
   const fetchPosts = async () => {
-    const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/fetchPosts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ topic_id: topicId }),
-    });
+    const response = await authenticatedFetch(
+      `${process.env.REACT_APP_API_URL}/fetchPosts`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topic_id: topicId }),
+      }
+    );
     const data = await response.json();
     if (data !== null) {
       setPosts(data);
     }
-  }
+  };
 
   useEffect(() => {
     fetchPosts();
-  }, [openCreatePost])
+  }, [openCreatePost]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -47,7 +58,7 @@ export default function PostsPage() {
       />
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, mt: 14, px: { xs: 2, md: "15%" }, pb: 8 }}>
+      <Box sx={{ flex: 1, mt: 14, px: "10%", pb: 8 }}>
         {/* Back Button */}
         <IconButton
           onClick={() => navigate("/topics")}
@@ -67,42 +78,30 @@ export default function PostsPage() {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
             justifyContent: "space-between",
-            alignItems: "flex-start",
-            mb: 6,
+            px: { xs: 2, sm: 3, md: 6 },
+            mb: { xs: 2, md: 4 },
           }}
         >
-          <Box sx={{ maxWidth: "700px" }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{ fontWeight: 800, mb: 1, letterSpacing: "-1px" }}
-            >
-              {title}
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "text.secondary", fontSize: "1.1rem" }}
-            >
-              {description}
-            </Typography>
-          </Box>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: 24, sm: 28, md: 32 },
+              py: { xs: 1, md: 2 },
+              color: "text.primary",
+            }}
+          >
+            {title}
+          </Typography>
 
           <Button
-            variant="contained"
-            startIcon={<AddIcon />}
             sx={{
-              backgroundColor: "secondary.main",
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              py: 1.2,
-              borderRadius: 2,
-              boxShadow: "0 4px 14px rgba(239, 175, 103, 0.4)",
-              "&:hover": {
-                backgroundColor: "#f08812ff",
-                boxShadow: "0 6px 20px rgba(242, 126, 9, 0.6)",
-              },
+              color: "secondary.main",
+              fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
+              px: { xs: 1.5, sm: 2, md: 3 },
+              py: { xs: 0.5, sm: 1 },
             }}
             onClick={() => setOpenCreatePost(true)}
           >
@@ -111,7 +110,7 @@ export default function PostsPage() {
         </Box>
 
         {/* Search Bar */}
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ px: 2, mb: 4 }}>
           <TextField
             fullWidth
             variant="outlined"
@@ -140,31 +139,56 @@ export default function PostsPage() {
           />
         </Box>
 
-        {/* Posts List */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
-          {posts
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .filter((post) => {
-              if (!searchQuery) return true;
-              const query = searchQuery.toLowerCase();
-              return (
-                post.title.toLowerCase().includes(query) ||
-                post.content.toLowerCase().includes(query) ||
-                post.username.toLowerCase().includes(query)
-              );
-            })
-            .map((post) => (
-              <PostCard
-                key={post.id}
-                title={post.title}
-                content={post.content}
-                id={post.id}
-                username={post.username}
-                user_id={post.user_id}
-                created_at={post.created_at}
-                onPostChanged={fetchPosts}
-              />
-            ))}
+        <Box sx={{ flexGrow: 1, px: 2 }}>
+          {/* Posts List */}
+          {/* dynamically returns the required number of columns depending on
+          number of posts and screen width */}
+          {(() => {
+            const filteredPosts = posts
+              .sort(
+                (a, b) =>
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+              )
+              .filter((post) => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                return (
+                  post.title.toLowerCase().includes(query) ||
+                  post.content.toLowerCase().includes(query) ||
+                  post.username.toLowerCase().includes(query)
+                );
+              });
+
+            const postCount = filteredPosts.length;
+
+            return (
+              <Grid
+                container
+                spacing={{ xs: 2, sm: 2, md: 3, lg: 4 }}
+                columns={{
+                  xs: Math.min(postCount, 1) * 12,
+                  sm: Math.min(postCount, 2) * 6,
+                  md: Math.min(postCount, 3) * 4,
+                }}
+                sx={{ flexGrow: 1 }}
+              >
+                {filteredPosts.map((post) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.id}>
+                    <PostCard
+                      title={post.title}
+                      content={post.content}
+                      id={post.id}
+                      username={post.username}
+                      user_id={post.user_id}
+                      created_at={post.created_at}
+                      onPostChanged={fetchPosts}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            );
+          })()}
         </Box>
       </Box>
     </Box>

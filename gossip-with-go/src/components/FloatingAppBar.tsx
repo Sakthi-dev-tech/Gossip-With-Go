@@ -24,7 +24,8 @@ export default function FloatingAppBar({
 
   useEffect(() => {
     // Get JWT token from localStorage during production or cookie
-    const token = localStorage.getItem("access_token") || getCookie("access_token");
+    const token =
+      localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         // Decode the JWT token to get the username
@@ -71,7 +72,7 @@ export default function FloatingAppBar({
           variant="h6"
           component="div"
           sx={{
-            fontWeight: 700,
+            fontWeight: { xs: 500, sm: 500, md: 700 },
             color: "text.primary",
             letterSpacing: "-0.5px",
           }}
@@ -87,7 +88,7 @@ export default function FloatingAppBar({
               px: 2,
               py: 1,
               borderRadius: 2,
-              display: "flex",
+              display: { xs: "none", md: "flex" },
               alignItems: "center",
               border: "1px solid rgba(255, 255, 255, 0.1)",
             }}

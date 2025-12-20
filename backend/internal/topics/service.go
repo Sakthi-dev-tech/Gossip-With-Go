@@ -2,10 +2,13 @@ package topics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func NewService(repo *repo.Queries, db *pgx.Conn) Service {
@@ -31,7 +34,16 @@ func (s *svc) CreateTopic(ctx context.Context, params repo.CreateTopicParams) (r
 
 	topic, err := qtx.CreateTopic(ctx, params)
 	if err != nil {
-		return repo.Topic{}, err
+		// return a more user friendly error message
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.UniqueViolation:
+				return repo.Topic{}, fmt.Errorf("topic already exists")
+			default:
+				return repo.Topic{}, fmt.Errorf("database error: %s", pgErr.Hint)
+			}
+		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {

@@ -1,4 +1,11 @@
-import { Box, Button, Grid, Typography, TextField, InputAdornment } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FloatingAppBar from "../components/FloatingAppBar";
 import TopicsBox from "../components/TopicsBox";
@@ -34,9 +41,7 @@ export default function TopicsPage() {
       setAllTopics(data);
     } catch (error) {
       const errMsg =
-        error instanceof Error
-          ? error.message
-          : "An Unexpected Error Occurred";
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
       setErrorMessage(capitaliseWords(errMsg));
       console.error("Failed to fetch topics:", error);
     }
@@ -66,14 +71,14 @@ export default function TopicsPage() {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            px: 6,
+            px: { xs: 2, sm: 3, md: 6 },
           }}
         >
           <Typography
             sx={{
               fontWeight: 700,
-              fontSize: 32,
-              py: 2,
+              fontSize: { xs: 24, sm: 28, md: 32 },
+              py: { xs: 1, md: 2 },
               color: "text.primary",
             }}
           >
@@ -81,7 +86,12 @@ export default function TopicsPage() {
           </Typography>
 
           <Button
-            sx={{ color: "secondary.main" }}
+            sx={{
+              color: "secondary.main",
+              fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
+              px: { xs: 1.5, sm: 2, md: 3 },
+              py: { xs: 0.5, sm: 1 },
+            }}
             onClick={() => setOpenCreateTopic(true)}
           >
             Create Topic
@@ -89,7 +99,7 @@ export default function TopicsPage() {
         </Box>
 
         {/* Search Bar */}
-        <Box sx={{ px: 6, mb: 4 }}>
+        <Box sx={{ px: 2, mb: 4 }}>
           <TextField
             fullWidth
             variant="outlined"
@@ -118,10 +128,17 @@ export default function TopicsPage() {
           />
         </Box>
 
-        <Box sx={{ flexGrow: 1, px: 4 }}>
-          <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-            {allTopics
-              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        <Box sx={{ flexGrow: 1, px: 2 }}>
+          {/* Topics Grid */}
+          {/* dynamically returns the required number of columns depending on
+          number of topics and screen width */}
+          {(() => {
+            const filteredTopics = allTopics
+              .sort(
+                (a, b) =>
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+              )
               .filter((topic) => {
                 if (!searchQuery) return true;
                 const query = searchQuery.toLowerCase();
@@ -130,21 +147,41 @@ export default function TopicsPage() {
                   topic.description.toLowerCase().includes(query) ||
                   topic.username.toLowerCase().includes(query)
                 );
-              })
-              .map((topic) => (
-                <Grid size={6} key={topic.id}>
-                  <TopicsBox
-                    topicId={topic.id}
-                    title={topic.name}
-                    description={topic.description}
-                    user_id={topic.user_id}
-                    username={topic.username}
-                    createdAt={topic.created_at}
-                    onTopicChanged={fetchTopics}
-                  />
-                </Grid>
-              ))}
-          </Grid>
+              });
+
+            const topicCount = filteredTopics.length;
+
+            return (
+              <Grid
+                container
+                alignItems={"center"}
+                spacing={{ xs: 2, sm: 2, md: 3, lg: 4 }}
+                // sets the number of columns based on the number of topics
+                columns={{
+                  xs: Math.min(topicCount, 1) * 12,
+                  sm: Math.min(topicCount, 2) * 6,
+                  md: Math.min(topicCount, 3) * 4,
+                }}
+                sx={{ flexGrow: 1 }}
+              >
+                {filteredTopics.map((topic) => (
+                  // make each topic take up the same amount of columns
+                  // out of the total above
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={topic.id}>
+                    <TopicsBox
+                      topicId={topic.id}
+                      title={topic.name}
+                      description={topic.description}
+                      user_id={topic.user_id}
+                      username={topic.username}
+                      createdAt={topic.created_at}
+                      onTopicChanged={fetchTopics}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            );
+          })()}
         </Box>
       </Box>
 
