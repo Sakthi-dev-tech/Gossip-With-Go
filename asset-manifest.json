@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Gossip-With-Go/static/css/main.c2ab1c4b.css",
-    "main.js": "/Gossip-With-Go/static/js/main.6d070351.js",
+    "main.js": "/Gossip-With-Go/static/js/main.8b4bf87f.js",
     "static/js/453.d1d99659.chunk.js": "/Gossip-With-Go/static/js/453.d1d99659.chunk.js",
     "index.html": "/Gossip-With-Go/index.html",
     "main.c2ab1c4b.css.map": "/Gossip-With-Go/static/css/main.c2ab1c4b.css.map",
-    "main.6d070351.js.map": "/Gossip-With-Go/static/js/main.6d070351.js.map",
+    "main.8b4bf87f.js.map": "/Gossip-With-Go/static/js/main.8b4bf87f.js.map",
     "453.d1d99659.chunk.js.map": "/Gossip-With-Go/static/js/453.d1d99659.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c2ab1c4b.css",
-    "static/js/main.6d070351.js"
+    "static/js/main.8b4bf87f.js"
   ]
 }
