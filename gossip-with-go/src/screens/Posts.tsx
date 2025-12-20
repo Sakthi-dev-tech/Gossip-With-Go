@@ -79,22 +79,36 @@ export default function PostsPage() {
           sx={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "space-between",
             px: { xs: 2, sm: 3, md: 6 },
             mb: { xs: 2, md: 4 },
           }}
         >
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: { xs: 24, sm: 28, md: 32 },
-              py: { xs: 1, md: 2 },
-              color: "text.primary",
-            }}
-          >
-            {title}
-          </Typography>
+          <Box sx={{ flex: 1, mr: 2 }}>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: 24, sm: 28, md: 32 },
+                color: "text.primary",
+                mb: description ? 1 : 0,
+              }}
+            >
+              {title}
+            </Typography>
+            {description && (
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.6,
+                  fontSize: { xs: "0.875rem", sm: "0.95rem", md: "1rem" },
+                }}
+              >
+                {description}
+              </Typography>
+            )}
+          </Box>
 
           <Button
             sx={{
@@ -102,6 +116,7 @@ export default function PostsPage() {
               fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
               px: { xs: 1.5, sm: 2, md: 3 },
               py: { xs: 0.5, sm: 1 },
+              flexShrink: 0,
             }}
             onClick={() => setOpenCreatePost(true)}
           >
