@@ -6,7 +6,7 @@ import { theme } from "./theme";
 import LoginPage from "./screens/Login";
 import TopicsPage from "./screens/Topics";
 import PostsPage from "./screens/Posts";
-import PostDetailPage from "./screens/PostDetail";
+import CommentsPage from "./screens/Comments";
 import { AuthProvider } from "./context/AuthContext";
 import { PublicRoute } from "./routes/PublicRoute";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
@@ -28,7 +28,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/topics" element={<TopicsPage />} />
               <Route path="/posts" element={<PostsPage />} />
-              <Route path="/post" element={<PostDetailPage />} />
+              <Route path="/comments" element={<CommentsPage />} />
             </Route>
           </Routes>
         </HashRouter>

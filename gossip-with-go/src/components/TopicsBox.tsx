@@ -155,6 +155,7 @@ export default function TopicsBox({
         sx={{
           width: "100%",
           height: "100%",
+          minHeight: "280px",
           display: "flex",
           flexDirection: "column",
           backgroundColor: "rgba(30, 41, 59, 0.7)",
@@ -249,6 +250,11 @@ export default function TopicsBox({
               color: "text.secondary",
               flex: 1,
               lineHeight: 1.6,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {description}

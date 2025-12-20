@@ -35,6 +35,8 @@ interface PostCardProps {
   username: string;
   user_id: number;
   created_at: string;
+  topic_title?: string;
+  topic_description?: string;
   onPostChanged?: () => void;
 }
 
@@ -45,6 +47,8 @@ export default function PostCard({
   username,
   user_id,
   created_at,
+  topic_title,
+  topic_description,
   onPostChanged,
 }: PostCardProps) {
   const navigate = useNavigate();
@@ -283,7 +287,7 @@ export default function PostCard({
             <Button
               endIcon={<ArrowForwardIcon />}
               onClick={() =>
-                navigate(`/post`, {
+                navigate(`/comments`, {
                   state: {
                     post_id: id,
                     title: title,
@@ -291,6 +295,8 @@ export default function PostCard({
                     username,
                     user_id,
                     created_at,
+                    topic_title,
+                    topic_description,
                   },
                 })
               }

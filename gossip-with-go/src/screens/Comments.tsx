@@ -4,7 +4,7 @@ import {
   Divider,
   Button,
   TextField,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FloatingAppBar from "../components/FloatingAppBar";
@@ -26,11 +26,20 @@ interface JWTPayload {
   exp: number;
 }
 
-export default function PostDetailPage() {
+export default function CommentsPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
-  const { title, content, username, user_id, created_at, post_id } = location.state;
+  const {
+    title,
+    content,
+    username,
+    user_id,
+    created_at,
+    post_id,
+    topic_title,
+    topic_description,
+  } = location.state;
 
   const [comment, setComment] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,7 +49,8 @@ export default function PostDetailPage() {
 
   // Get current user ID from JWT token
   const getCurrentUserId = (): number | null => {
-    const token = localStorage.getItem("access_token") || getCookie("access_token");
+    const token =
+      localStorage.getItem("access_token") || getCookie("access_token");
     if (token) {
       try {
         const decoded = jwtDecode<JWTPayload>(token);
@@ -66,13 +76,16 @@ export default function PostDetailPage() {
     }
 
     try {
-      const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/addComment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ "content": comment, "post_id": post_id }),
-      });
+      const response = await authenticatedFetch(
+        `${process.env.REACT_APP_API_URL}/addComment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: comment, post_id: post_id }),
+        }
+      );
 
       if (response.ok) {
         setComment("");
@@ -84,9 +97,7 @@ export default function PostDetailPage() {
       }
     } catch (error) {
       const errMsg =
-        error instanceof Error
-          ? error.message
-          : "An Unexpected Error Occurred";
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
       setErrorMessage(capitaliseWords(errMsg));
       console.error("Error posting comment:", error);
     }
@@ -94,13 +105,16 @@ export default function PostDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const response = await authenticatedFetch(`${process.env.REACT_APP_API_URL}/fetchComments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ "post_id": post_id }),
-      });
+      const response = await authenticatedFetch(
+        `${process.env.REACT_APP_API_URL}/fetchComments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ post_id: post_id }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -111,13 +125,13 @@ export default function PostDetailPage() {
         }
       } else {
         const errorData = await response.text();
-        setErrorMessage(capitaliseWords(errorData || "Failed To Fetch Comments"));
+        setErrorMessage(
+          capitaliseWords(errorData || "Failed To Fetch Comments")
+        );
       }
     } catch (error) {
       const errMsg =
-        error instanceof Error
-          ? error.message
-          : "An Unexpected Error Occurred";
+        error instanceof Error ? error.message : "An Unexpected Error Occurred";
       setErrorMessage(capitaliseWords(errMsg));
       console.error("Error fetching comments:", error);
     }
@@ -159,6 +173,49 @@ export default function PostDetailPage() {
             mb: 4,
           }}
         >
+          {topic_title && (
+            <Box
+              sx={{
+                mb: 2,
+                pb: 2,
+                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <Typography
+                variant="overline"
+                sx={{
+                  color: "secondary.main",
+                  fontWeight: 600,
+                  letterSpacing: 1,
+                  fontSize: "0.75rem",
+                }}
+              >
+                Topic
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 700,
+                  mb: topic_description ? 0.5 : 0,
+                }}
+              >
+                {topic_title}
+              </Typography>
+              {topic_description && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {topic_description}
+                </Typography>
+              )}
+            </Box>
+          )}
+
           <Typography
             variant="h3"
             component="h1"
@@ -258,22 +315,24 @@ export default function PostDetailPage() {
 
           {/* Comment List */}
 
-          {
-            comments
-              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-              .map((comment) => (
-                <CommentBox
-                  key={comment.id}
-                  commentId={comment.id}
-                  username={comment.username}
-                  content={comment.content}
-                  user_id={comment.user_id}
-                  created_at={comment.created_at}
-                  isOwner={comment.user_id === currentUserId}
-                  refreshComments={fetchComments}
-                />
-              ))
-          }
+          {comments
+            .sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )
+            .map((comment) => (
+              <CommentBox
+                key={comment.id}
+                commentId={comment.id}
+                username={comment.username}
+                content={comment.content}
+                user_id={comment.user_id}
+                created_at={comment.created_at}
+                isOwner={comment.user_id === currentUserId}
+                refreshComments={fetchComments}
+              />
+            ))}
         </Box>
       </Box>
 

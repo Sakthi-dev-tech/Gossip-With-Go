@@ -183,6 +183,8 @@ export default function PostsPage() {
                       user_id={post.user_id}
                       created_at={post.created_at}
                       onPostChanged={fetchPosts}
+                      topic_title={title}
+                      topic_description={description}
                     />
                   </Grid>
                 ))}
