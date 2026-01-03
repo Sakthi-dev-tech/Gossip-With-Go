@@ -19,7 +19,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // ParseUserToken validates and parses an existing JWT token
@@ -123,34 +123,42 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("server is up"))
 	})
 
-	authService := authentication.NewService(repo.New(app.db), app.db)
+	// Create repository once - this is shared by all services
+	queries := repo.New(app.db)
+
+	authService := authentication.NewService(queries, app.db)
 	authHandler := authentication.NewHandler(authService)
 	r.Post("/register", authHandler.CreateUser)
 	r.Post("/login", authHandler.LoginUser)
 
+	userService := users.NewService(queries, app.db)
+	usersHandler := users.NewHandler(userService)
+
+	topicService := topics.NewService(queries, app.db)
+	topicsHandler := topics.NewHandler(topicService)
+
+	postService := posts.NewService(queries, app.db)
+	postsHandler := posts.NewHandler(postService)
+
+	commentService := comments.NewService(queries, app.db)
+	commentsHandler := comments.NewHandler(commentService)
+
+	// Protected routes - require JWT authentication
 	r.Group(func(r chi.Router) {
 		r.Use(JWTAuthMiddleware) // JWT authentication middleware
 
-		userService := users.NewService(repo.New(app.db), app.db)
-		usersHandler := users.NewHandler(userService)
 		r.Get("/fetchUserByUsername", usersHandler.FetchUserByUsername)
 
-		topicService := topics.NewService(repo.New(app.db), app.db)
-		topicsHandler := topics.NewHandler(topicService)
 		r.Get("/fetchTopics", topicsHandler.ListTopics)
 		r.Post("/addTopic", topicsHandler.CreateTopic)
 		r.Put("/updateTopic", topicsHandler.UpdateTopic)
 		r.Delete("/deleteTopic", topicsHandler.DeleteTopic)
 
-		postService := posts.NewService(repo.New(app.db), app.db)
-		postsHandler := posts.NewHandler(postService)
 		r.Post("/fetchPosts", postsHandler.ListPosts)
 		r.Post("/addPost", postsHandler.CreatePost)
 		r.Put("/updatePost", postsHandler.UpdatePost)
 		r.Delete("/deletePost", postsHandler.DeletePost)
 
-		commentService := comments.NewService(repo.New(app.db), app.db)
-		commentsHandler := comments.NewHandler(commentService)
 		r.Post("/fetchComments", commentsHandler.ListComments)
 		r.Post("/addComment", commentsHandler.CreateComment)
 		r.Put("/updateComment", commentsHandler.UpdateComment)
@@ -178,7 +186,7 @@ func (app *application) run(h http.Handler) error {
 
 type application struct {
 	config config
-	db     *pgx.Conn
+	db     *pgxpool.Pool
 }
 
 type config struct {

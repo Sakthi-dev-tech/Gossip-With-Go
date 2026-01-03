@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
-	"github.com/jackc/pgx/v5"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/db"
 )
 
-func NewService(repo *repo.Queries, db *pgx.Conn) Service {
-	return &svc{repo: repo, db: db}
+func NewService(repo *repo.Queries, pool db.Pool) Service {
+	return &svc{repo: repo, db: pool}
 }
 
 func (s *svc) ListPosts(ctx context.Context, topicId int64) ([]repo.Post, error) {

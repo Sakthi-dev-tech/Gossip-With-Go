@@ -7,4 +7,5 @@ This is an app made for the CVWO Winter Assignment
 - Used Claude Sonnet 4.5 for helping out with repetitive work that takes time
 - Used Gemini 3 Pro to help me understand how to go about structuring the Go backend
 - Used Claude Sonnet 4.5 to teach me how to deploy the frontend on GitHub Pages
+- Used Claude Sonnet 4.5 to help me research on how to make my backend more efficient to save costs
 - Used Claude Opus 4.5 to teach me how to deploy the backend on Railway

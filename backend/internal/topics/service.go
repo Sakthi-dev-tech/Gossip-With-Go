@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/db"
 	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func NewService(repo *repo.Queries, db *pgx.Conn) Service {
-	return &svc{repo: repo, db: db}
+func NewService(repo *repo.Queries, pool db.Pool) Service {
+	return &svc{repo: repo, db: pool}
 }
 
 func (s *svc) ListTopics(ctx context.Context) ([]repo.Topic, error) {

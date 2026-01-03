@@ -4,7 +4,7 @@ import (
 	"context"
 
 	repo "github.com/Sakthi-dev-tech/Gossip-With-Go/internal/adapters/postgresql/sqlc"
-	"github.com/jackc/pgx/v5"
+	"github.com/Sakthi-dev-tech/Gossip-With-Go/internal/db"
 )
 
 type handler struct {
@@ -14,7 +14,7 @@ type handler struct {
 type svc struct {
 	// database
 	repo *repo.Queries
-	db   *pgx.Conn
+	db   db.Pool
 }
 
 type Service interface {
