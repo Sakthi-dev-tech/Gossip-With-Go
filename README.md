@@ -58,7 +58,6 @@
 ---
 
 ## AI Usage Documentation
-**(Placeholder: Please update this section with your specific details)**
 
 *   **Code Generation:** 
     * Used Gemini 3 Pro for frontend design and helping out with implementation as I am comfortable with React
