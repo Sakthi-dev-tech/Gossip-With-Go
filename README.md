@@ -4,8 +4,8 @@
 *   **Name:** Meenakshi Sundaram Sakthieesvar
 *   **Matriculation Number:** A0322186H
 ## Links
-*   **Source Code Repository:** [https://github.com/Sakthi-dev-tech/Gossip-With-Go](Github Link)
-*   **Deployed Application:** [https://sakthi-dev-tech.github.io/Gossip-With-Go/](Deployed Website)
+*   **Source Code Repository:** [Github Link](https://github.com/Sakthi-dev-tech/Gossip-With-Go)
+*   **Deployed Application:** [Deployed Website](https://sakthi-dev-tech.github.io/Gossip-With-Go/)
 
 ---
 
